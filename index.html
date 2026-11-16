@@ -2906,48 +2906,52 @@
         /* --------------------------------------------------------------------------
            STATE MANAGEMENT (INITIALIZES COMPLETELY BLANK / 0.00 NAIRA ON START)
            -------------------------------------------------------------------------- */
-        let appData = {
-            student: {
-                enabled: true,
-                expectedAllowanceDay: 28,
-                allowanceAmount: 0,
-                handouts: [],
-                sinkingFunds: []
-            },
-            wallets: [
-                { id: "w-main", name: "Primary Commercial Bank", balance: 0, tag: "Commercial Bank" },
-                { id: "w-opay", name: "Fintech (OPay/PalmPay)", balance: 0, tag: "Daily Spends" },
-                { id: "w-cash", name: "Cash in Hand", balance: 0, tag: "Physical Cash" },
-                { id: "w-locked", name: "Locked Savings", balance: 0, tag: "SafeLock / Target" }
-            ],
-            transactions: [],
-            marketStaples: [],
-            debts: [],
-            todos: [],
-            sinkingFunds: [],
-            utilities: {
-                nepa: {
-                    lastDate: null,
-                    amount: 0,
-                    unitsLoaded: 0,
-                    dailyBurn: 0
+        function getCleanDefaultAppData() {
+            return {
+                student: {
+                    enabled: true,
+                    expectedAllowanceDay: 28,
+                    allowanceAmount: 0,
+                    handouts: [],
+                    sinkingFunds: []
                 },
-                gas: {
-                    lastDate: null,
-                    sizeKg: 0,
-                    cost: 0,
-                    typicalDays: 0
-                }
-            },
-            quickPresets: JSON.parse(JSON.stringify(DEFAULT_QUICK_PRESETS)),
-            dailyMeals: {
-                breakfast: 0,
-                lunch: 0,
-                dinner: 0,
-                date: ""
-            },
-            todayPlate: []
-        };
+                wallets: [
+                    { id: "w-main", name: "Primary Commercial Bank", balance: 0, tag: "Commercial Bank" },
+                    { id: "w-opay", name: "Fintech (OPay/PalmPay)", balance: 0, tag: "Daily Spends" },
+                    { id: "w-cash", name: "Cash in Hand", balance: 0, tag: "Physical Cash" },
+                    { id: "w-locked", name: "Locked Savings", balance: 0, tag: "SafeLock / Target" }
+                ],
+                transactions: [],
+                marketStaples: [],
+                debts: [],
+                todos: [],
+                sinkingFunds: [],
+                utilities: {
+                    nepa: {
+                        lastDate: null,
+                        amount: 0,
+                        unitsLoaded: 0,
+                        dailyBurn: 0
+                    },
+                    gas: {
+                        lastDate: null,
+                        sizeKg: 0,
+                        cost: 0,
+                        typicalDays: 0
+                    }
+                },
+                quickPresets: JSON.parse(JSON.stringify(DEFAULT_QUICK_PRESETS)),
+                dailyMeals: {
+                    breakfast: 0,
+                    lunch: 0,
+                    dinner: 0,
+                    date: ""
+                },
+                todayPlate: []
+            };
+        }
+
+        let appData = getCleanDefaultAppData();
 
         let ogaModeActive = false;
         let currentDebtSubTab = "owing_me";
@@ -6071,20 +6075,58 @@
 
         async function handleAuthSignOut() {
             if (!confirm("Are you sure you want to log out of your NairaFlow account?")) return;
+
+            // 1. Sign out of Supabase if active
             if (supabaseClient) {
                 try {
                     await supabaseClient.auth.signOut();
-                } catch (e) {}
+                } catch (e) {
+                    console.warn("Supabase sign out error:", e);
+                }
             }
+
+            // 2. Wipe current user session & all local cached data of this account
             setCurrentUserSession(null);
+            localStorage.removeItem("nairaflow_current_user");
             localStorage.removeItem("nairaflow_guest_mode");
+            localStorage.removeItem("nairaflow_db_v2");
+            localStorage.removeItem("nairaflow_db_v1");
+
+            // 3. Reset app memory to a 100% clean, blank state
+            appData = getCleanDefaultAppData();
+            saveLocalStateOnly();
+
+            // 4. Update Header & All Tabs to clean blank state
             renderHeaderAuthPill();
             updateSettingsAccountSection();
-            showToast("Logged out successfully! 👋");
-            loadState();
+            switchTab('dashboard');
             renderDashboard();
             renderStudentCampusHub();
             renderTransactions();
+            renderMarketStaples();
+            renderBillsAndEstimators();
+            renderDebts();
+            renderTodos();
+
+            // 5. Clear login & registration form inputs
+            const emailInp = document.getElementById("authLoginEmail");
+            const passInp = document.getElementById("authLoginPassword");
+            const regName = document.getElementById("authRegisterName");
+            const regEmail = document.getElementById("authRegisterEmail");
+            const regPass = document.getElementById("authRegisterPassword");
+            if (emailInp) emailInp.value = "";
+            if (passInp) passInp.value = "";
+            if (regName) regName.value = "";
+            if (regEmail) regEmail.value = "";
+            if (regPass) regPass.value = "";
+
+            showToast("Logged out successfully. All session data cleared! 👋");
+
+            // 6. Immediately take the user to the Login page
+            switchAuthTab("signin");
+            setTimeout(() => {
+                openAuthModal();
+            }, 150);
         }
 
         /* --------------------------------------------------------------------------
