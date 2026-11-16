@@ -2906,6 +2906,21 @@
         /* --------------------------------------------------------------------------
            STATE MANAGEMENT (INITIALIZES COMPLETELY BLANK / 0.00 NAIRA ON START)
            -------------------------------------------------------------------------- */
+        function isValidUUID(str) {
+            if (!str || typeof str !== 'string') return false;
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+        }
+
+        function generateUUID() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
         function getCleanDefaultAppData() {
             return {
                 student: {
@@ -2916,10 +2931,10 @@
                     sinkingFunds: []
                 },
                 wallets: [
-                    { id: "w-main", name: "Primary Commercial Bank", balance: 0, tag: "Commercial Bank" },
-                    { id: "w-opay", name: "Fintech (OPay/PalmPay)", balance: 0, tag: "Daily Spends" },
-                    { id: "w-cash", name: "Cash in Hand", balance: 0, tag: "Physical Cash" },
-                    { id: "w-locked", name: "Locked Savings", balance: 0, tag: "SafeLock / Target" }
+                    { id: generateUUID(), name: "Primary Commercial Bank", balance: 0, tag: "Commercial Bank" },
+                    { id: generateUUID(), name: "Fintech (OPay/PalmPay)", balance: 0, tag: "Daily Spends" },
+                    { id: generateUUID(), name: "Cash in Hand", balance: 0, tag: "Physical Cash" },
+                    { id: generateUUID(), name: "Locked Savings", balance: 0, tag: "SafeLock / Target" }
                 ],
                 transactions: [],
                 marketStaples: [],
@@ -6266,21 +6281,26 @@
             if (!supabaseClient || !currentUser) return;
             try {
                 // 1. Wallets
-                const { data: walletsData } = await supabaseClient.from('wallets').select('*');
+                const { data: walletsData, error: wErr } = await supabaseClient.from('wallets').select('*');
+                if (wErr) console.error("Load wallets error:", wErr);
                 if (walletsData && walletsData.length > 0) {
                     appData.wallets = walletsData.map(w => ({
                         id: w.id,
                         name: w.name,
-                        bankName: w.bank_name,
+                        bankName: w.bank_name || w.name,
                         balance: parseFloat(w.balance) || 0,
-                        tag: w.tag,
-                        isLocked: w.is_locked
+                        tag: w.tag || 'Commercial Bank',
+                        isLocked: !!w.is_locked
                     }));
+                } else {
+                    // Seed initial user wallets if completely blank in DB
+                    await syncStateToCloud();
                 }
 
                 // 2. Transactions
-                const { data: txData } = await supabaseClient.from('transactions').select('*').order('date', { ascending: false });
-                if (txData) {
+                const { data: txData, error: txErr } = await supabaseClient.from('transactions').select('*').order('date', { ascending: false });
+                if (txErr) console.error("Load transactions error:", txErr);
+                if (txData && txData.length > 0) {
                     appData.transactions = txData.map(t => ({
                         id: t.id,
                         walletId: t.wallet_id,
@@ -6294,20 +6314,20 @@
 
                 // 3. Handouts
                 const { data: handoutsData } = await supabaseClient.from('campus_handouts').select('*');
-                if (handoutsData) {
+                if (handoutsData && handoutsData.length > 0) {
                     if (!appData.student) appData.student = {};
                     appData.student.handouts = handoutsData.map(h => ({
                         id: h.id,
                         title: h.title,
                         cost: parseFloat(h.cost) || 0,
-                        paid: h.paid,
+                        paid: !!h.paid,
                         dueDate: h.due_date
                     }));
                 }
 
                 // 4. Sinking Funds
                 const { data: sinkingData } = await supabaseClient.from('campus_sinking_funds').select('*');
-                if (sinkingData) {
+                if (sinkingData && sinkingData.length > 0) {
                     if (!appData.student) appData.student = {};
                     appData.student.sinkingFunds = sinkingData.map(sf => ({
                         id: sf.id,
@@ -6315,7 +6335,7 @@
                         targetAmount: parseFloat(sf.target_amount) || 0,
                         currentSaved: parseFloat(sf.current_saved) || 0,
                         deadline: sf.deadline,
-                        icon: sf.icon
+                        icon: sf.icon || '🏠'
                     }));
                 }
 
@@ -6333,7 +6353,7 @@
 
                 // 6. Calorie Plate
                 const { data: plateData } = await supabaseClient.from('calorie_plate_items').select('*').eq('logged_date', todayDate);
-                if (plateData) {
+                if (plateData && plateData.length > 0) {
                     appData.todayPlate = plateData.map(p => ({
                         foodId: p.food_id,
                         qty: parseFloat(p.quantity) || 1
@@ -6342,22 +6362,27 @@
 
                 // 7. Debts
                 const { data: debtsData } = await supabaseClient.from('debts').select('*');
-                if (debtsData) {
+                if (debtsData && debtsData.length > 0) {
                     appData.debts = debtsData.map(d => ({
                         id: d.id,
                         person: d.person,
                         amount: parseFloat(d.amount) || 0,
                         type: d.type,
-                        reason: d.reason,
+                        reason: d.reason || '',
                         dueDate: d.due_date,
-                        status: d.status
+                        status: d.status || 'unpaid'
                     }));
                 }
 
-                saveLocalStateOnly(); // Update offline cache without triggering a redundant syncStateToCloud!
+                saveLocalStateOnly();
                 renderDashboard();
                 renderStudentCampusHub();
                 renderTransactions();
+                renderMarketStaples();
+                renderBillsAndEstimators();
+                renderDebts();
+                renderTodos();
+
                 if (showToastFeedback) {
                     showToast("Synced with Cloud SQL! 🟢");
                 }
@@ -6392,100 +6417,129 @@
             isCloudSyncing = true;
 
             try {
-                // Upsert Wallets
+                // 1. Upsert Wallets
                 if (appData.wallets && appData.wallets.length > 0) {
-                    const walletRows = appData.wallets.map(w => ({
-                        id: w.id || undefined,
-                        user_id: currentUser.id,
-                        name: w.name,
-                        bank_name: w.bankName || w.name,
-                        balance: w.balance,
-                        tag: w.tag,
-                        is_locked: !!w.isLocked
-                    }));
-                    await supabaseClient.from('wallets').upsert(walletRows, { onConflict: 'id' }).catch(() => {});
+                    const walletRows = appData.wallets.map(w => {
+                        if (!isValidUUID(w.id)) w.id = generateUUID();
+                        return {
+                            id: w.id,
+                            user_id: currentUser.id,
+                            name: w.name,
+                            bank_name: w.bankName || w.name,
+                            balance: parseFloat(w.balance) || 0,
+                            tag: w.tag || 'Commercial Bank',
+                            is_locked: !!w.isLocked
+                        };
+                    });
+                    const { error: wErr } = await supabaseClient.from('wallets').upsert(walletRows, { onConflict: 'id' });
+                    if (wErr) console.error("Wallet sync error:", wErr.message);
                 }
 
-                // Upsert Transactions
+                // 2. Upsert Transactions
                 if (appData.transactions && appData.transactions.length > 0) {
-                    const txRows = appData.transactions.map(t => ({
-                        id: t.id || undefined,
-                        user_id: currentUser.id,
-                        wallet_id: t.walletId || null,
-                        type: t.type,
-                        title: t.title,
-                        amount: t.amount,
-                        category: t.category,
-                        date: t.date
-                    }));
-                    await supabaseClient.from('transactions').upsert(txRows, { onConflict: 'id' }).catch(() => {});
+                    const txRows = appData.transactions.map(t => {
+                        if (!isValidUUID(t.id)) t.id = generateUUID();
+                        let targetWalletId = null;
+                        if (isValidUUID(t.walletId)) {
+                            targetWalletId = t.walletId;
+                        } else if (appData.wallets && appData.wallets.length > 0) {
+                            targetWalletId = appData.wallets[0].id;
+                        }
+                        return {
+                            id: t.id,
+                            user_id: currentUser.id,
+                            wallet_id: targetWalletId,
+                            type: t.type,
+                            title: t.title,
+                            amount: parseFloat(t.amount) || 0,
+                            category: t.category,
+                            date: t.date || new Date().toISOString().split('T')[0]
+                        };
+                    });
+                    const { error: txErr } = await supabaseClient.from('transactions').upsert(txRows, { onConflict: 'id' });
+                    if (txErr) console.error("Transaction sync error:", txErr.message);
                 }
 
-                // Upsert Handouts
-                if (appData.student && appData.student.handouts) {
-                    const handoutRows = appData.student.handouts.map(h => ({
-                        id: h.id || undefined,
-                        user_id: currentUser.id,
-                        title: h.title,
-                        cost: h.cost,
-                        paid: !!h.paid,
-                        due_date: h.dueDate || null
-                    }));
-                    await supabaseClient.from('campus_handouts').upsert(handoutRows, { onConflict: 'id' }).catch(() => {});
+                // 3. Upsert Handouts
+                if (appData.student && appData.student.handouts && appData.student.handouts.length > 0) {
+                    const handoutRows = appData.student.handouts.map(h => {
+                        if (!isValidUUID(h.id)) h.id = generateUUID();
+                        return {
+                            id: h.id,
+                            user_id: currentUser.id,
+                            title: h.title,
+                            cost: parseFloat(h.cost) || 0,
+                            paid: !!h.paid,
+                            due_date: h.dueDate || null
+                        };
+                    });
+                    const { error: hErr } = await supabaseClient.from('campus_handouts').upsert(handoutRows, { onConflict: 'id' });
+                    if (hErr) console.error("Handouts sync error:", hErr.message);
                 }
 
-                // Upsert Sinking Funds
-                if (appData.student && appData.student.sinkingFunds) {
-                    const fundRows = appData.student.sinkingFunds.map(sf => ({
-                        id: sf.id || undefined,
-                        user_id: currentUser.id,
-                        title: sf.title,
-                        target_amount: sf.targetAmount,
-                        current_saved: sf.currentSaved,
-                        deadline: sf.deadline || null,
-                        icon: sf.icon || '🏠'
-                    }));
-                    await supabaseClient.from('campus_sinking_funds').upsert(fundRows, { onConflict: 'id' }).catch(() => {});
+                // 4. Upsert Sinking Funds
+                if (appData.student && appData.student.sinkingFunds && appData.student.sinkingFunds.length > 0) {
+                    const fundRows = appData.student.sinkingFunds.map(sf => {
+                        if (!isValidUUID(sf.id)) sf.id = generateUUID();
+                        return {
+                            id: sf.id,
+                            user_id: currentUser.id,
+                            title: sf.title,
+                            target_amount: parseFloat(sf.targetAmount) || 0,
+                            current_saved: parseFloat(sf.currentSaved) || 0,
+                            deadline: sf.deadline || null,
+                            icon: sf.icon || '🏠'
+                        };
+                    });
+                    const { error: sfErr } = await supabaseClient.from('campus_sinking_funds').upsert(fundRows, { onConflict: 'id' });
+                    if (sfErr) console.error("Sinking fund sync error:", sfErr.message);
                 }
 
-                // Upsert Debts
+                // 5. Upsert Debts
                 if (appData.debts && appData.debts.length > 0) {
-                    const debtRows = appData.debts.map(d => ({
-                        id: d.id || undefined,
-                        user_id: currentUser.id,
-                        person: d.person,
-                        amount: d.amount,
-                        type: d.type,
-                        reason: d.reason || '',
-                        due_date: d.dueDate || null,
-                        status: d.status || 'unpaid'
-                    }));
-                    await supabaseClient.from('debts').upsert(debtRows, { onConflict: 'id' }).catch(() => {});
+                    const debtRows = appData.debts.map(d => {
+                        if (!isValidUUID(d.id)) d.id = generateUUID();
+                        return {
+                            id: d.id,
+                            user_id: currentUser.id,
+                            person: d.person,
+                            amount: parseFloat(d.amount) || 0,
+                            type: d.type,
+                            reason: d.reason || '',
+                            due_date: d.dueDate || null,
+                            status: d.status || 'unpaid'
+                        };
+                    });
+                    const { error: dErr } = await supabaseClient.from('debts').upsert(debtRows, { onConflict: 'id' });
+                    if (dErr) console.error("Debts sync error:", dErr.message);
                 }
 
-                // Upsert Daily Meals
+                // 6. Upsert Daily Meals
                 if (appData.dailyMeals) {
                     const todayDate = new Date().toISOString().split('T')[0];
-                    await supabaseClient.from('daily_meal_spends').upsert({
+                    const { error: mErr } = await supabaseClient.from('daily_meal_spends').upsert({
                         user_id: currentUser.id,
                         date: todayDate,
-                        breakfast: appData.dailyMeals.breakfast || 0,
-                        lunch: appData.dailyMeals.lunch || 0,
-                        dinner: appData.dailyMeals.dinner || 0
-                    }, { onConflict: 'user_id,date' }).catch(() => {});
+                        breakfast: parseFloat(appData.dailyMeals.breakfast) || 0,
+                        lunch: parseFloat(appData.dailyMeals.lunch) || 0,
+                        dinner: parseFloat(appData.dailyMeals.dinner) || 0
+                    }, { onConflict: 'user_id,date' });
+                    if (mErr) console.error("Meal sync error:", mErr.message);
                 }
 
-                // Upsert Today's Calorie Plate
+                // 7. Upsert Today's Calorie Plate
                 if (appData.todayPlate && appData.todayPlate.length > 0) {
                     const todayDate = new Date().toISOString().split('T')[0];
                     const plateRows = appData.todayPlate.map(p => ({
+                        id: generateUUID(),
                         user_id: currentUser.id,
                         food_id: p.foodId,
-                        quantity: p.qty,
+                        quantity: parseFloat(p.qty) || 1,
                         logged_date: todayDate
                     }));
-                    await supabaseClient.from('calorie_plate_items').delete().eq('user_id', currentUser.id).eq('logged_date', todayDate).catch(() => {});
-                    await supabaseClient.from('calorie_plate_items').insert(plateRows).catch(() => {});
+                    await supabaseClient.from('calorie_plate_items').delete().eq('user_id', currentUser.id).eq('logged_date', todayDate);
+                    const { error: pErr } = await supabaseClient.from('calorie_plate_items').insert(plateRows);
+                    if (pErr) console.error("Plate sync error:", pErr.message);
                 }
 
                 if (forceAll) {
@@ -6642,7 +6696,9 @@
             renderDashboard();
             checkAuthSession();
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    reg.update();
+                }).catch(err => console.log('SW registration error:', err));
             }
         });
 
