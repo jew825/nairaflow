@@ -1171,7 +1171,7 @@
     <header>
         <div class="header-content">
             <div class="logo-area" onclick="switchTab('dashboard')">
-                <div class="logo-flag">&#8358;</div>
+                <div class="logo-flag" onclick="handleAdminLogoClick()" title="NairaFlow" style="cursor: pointer;">&#8358;</div>
                 <div>
                     <span class="brand-title">NaraFlow</span>
                     <span class="brand-pill" id="appModeBadge">🎓 Campus Edition</span>
@@ -1196,9 +1196,6 @@
                         <span>☰ Menu</span> <span style="font-size: 0.65rem;">▼</span>
                     </button>
                     <div class="dropdown-menu" id="headerDropdownMenu">
-                        <div class="dropdown-item highlight" onclick="openDbConfigModal(); closeMenuDropdown();">
-                            <span>☁️ Cloud SQL & Database Config</span>
-                        </div>
                         <div class="dropdown-item" onclick="switchTab('settings'); closeMenuDropdown();">
                             <span>💾 Data Backup & Restore</span>
                         </div>
@@ -2040,12 +2037,6 @@
             <button type="button" class="btn btn-outline" onclick="continueAsGuest()" style="width: 100%; padding: 9px; font-size: 0.82rem; font-weight: 700;">
                 📱 Continue as Guest (Offline Mode)
             </button>
-
-            <div style="margin-top: 16px; text-align: center; border-top: 1px solid var(--border); padding-top: 12px;">
-                <a href="javascript:void(0)" onclick="closeModal('authModal'); openDbConfigModal();" style="font-size: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 600;">
-                    ⚙️ Cloud SQL Database Config (Supabase Keys)
-                </a>
-            </div>
         </div>
     </div>
 
@@ -5490,6 +5481,26 @@
         }
 
         /* --------------------------------------------------------------------------
+           ADMIN SECRET TRIGGER (TAP ₦ LOGO 5 TIMES)
+           -------------------------------------------------------------------------- */
+        let adminClickCount = 0;
+        let adminClickTimer = null;
+        function handleAdminLogoClick() {
+            adminClickCount++;
+            clearTimeout(adminClickTimer);
+            adminClickTimer = setTimeout(() => { adminClickCount = 0; }, 2000);
+            if (adminClickCount >= 5) {
+                adminClickCount = 0;
+                const pin = prompt("🔐 NairaFlow Admin Access\nEnter Admin PIN to configure cloud database (Default: 1234):");
+                if (pin === "1234" || pin === "nairaflow") {
+                    openDbConfigModal();
+                } else if (pin !== null) {
+                    showToast("❌ Incorrect Admin PIN");
+                }
+            }
+        }
+
+        /* --------------------------------------------------------------------------
            DROPDOWN NAVIGATION
            -------------------------------------------------------------------------- */
         function toggleMenuDropdown(e) {
@@ -5512,21 +5523,24 @@
            CLOUD SQL (SUPABASE) AUTHENTICATION & MULTI-USER SYNCHRONIZATION
            -------------------------------------------------------------------------- */
         const DEFAULT_SUPABASE_CONFIG = {
-            url: "https://your-project.supabase.co",
+            url: "https://hugxbnfcovuaxowryzcl.supabase.co",
             anonKey: ""
         };
 
         function getSupabaseConfig() {
             try {
                 const saved = localStorage.getItem("nairaflow_supabase_config");
-                if (saved) return JSON.parse(saved);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.anonKey && parsed.anonKey.length > 20) return parsed;
+                }
             } catch (e) {}
             return DEFAULT_SUPABASE_CONFIG;
         }
 
         function initSupabaseClient() {
             const cfg = getSupabaseConfig();
-            if (window.supabase && cfg.url && cfg.anonKey && cfg.url !== DEFAULT_SUPABASE_CONFIG.url) {
+            if (window.supabase && cfg.url && cfg.anonKey && cfg.anonKey.trim().length > 15) {
                 try {
                     supabaseClient = window.supabase.createClient(cfg.url, cfg.anonKey);
                 } catch (e) {
@@ -5628,19 +5642,12 @@
                                 </div>
                                 ${isCloud ? `
                                     <div class="dropdown-item" onclick="loadUserDataFromCloud(); closeUserDropdown();">
-                                        <span>🔄 Refresh from Cloud SQL</span>
+                                        <span>🔄 Refresh Cloud Data</span>
                                     </div>
                                     <div class="dropdown-item" onclick="syncStateToCloud(true); closeUserDropdown();">
-                                        <span>☁️ Backup to Cloud SQL</span>
+                                        <span>☁️ Backup to Cloud</span>
                                     </div>
-                                ` : `
-                                    <div class="dropdown-item" onclick="openDbConfigModal(); closeUserDropdown();" style="color: var(--primary); font-weight: 700;">
-                                        <span>☁️ Connect Cloud SQL Database</span>
-                                    </div>
-                                `}
-                                <div class="dropdown-item" onclick="openDbConfigModal(); closeUserDropdown();">
-                                    <span>⚙️ Database Settings</span>
-                                </div>
+                                ` : ''}
                                 <div class="dropdown-divider"></div>
                                 <div class="dropdown-item" onclick="handleAuthSignOut(); closeUserDropdown();" style="color: var(--danger); font-weight: 700;">
                                     <span>🚪 Log Out (${name})</span>
@@ -5708,9 +5715,6 @@
                                 </div>
                             </div>
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn btn-outline btn-sm" onclick="openDbConfigModal()">
-                                    <span>⚙️ Cloud Config</span>
-                                </button>
                                 <button class="btn btn-danger btn-sm" onclick="handleAuthSignOut()">
                                     <span>🚪 Log Out</span>
                                 </button>
