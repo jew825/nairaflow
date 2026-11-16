@@ -352,9 +352,11 @@
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
-            padding: 8px 6px;
+            padding: 6px 2px;
             z-index: 50;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .bottom-nav-btn {
@@ -365,17 +367,19 @@
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 600;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 2px;
             border-radius: 8px;
-            gap: 3px;
+            gap: 2px;
             flex: 1;
+            min-width: 44px;
+            white-space: nowrap;
         }
 
         .bottom-nav-btn .b-icon {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
         }
 
         .bottom-nav-btn.active {
@@ -1606,6 +1610,27 @@
                     </div>
                 </div>
 
+                <!-- DASHBOARD TO-DO & ERRANDS QUICK CARD -->
+                <div class="card" style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <h3 class="card-title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                                ✅ Cost-Linked Tasks & Errands
+                            </h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0;">
+                                Check off errands with attached costs to automatically log them as expenses.
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-outline btn-sm" onclick="openTodoModal()">+ Add Task</button>
+                            <button class="btn btn-primary btn-sm" onclick="switchTab('todos')">Open To-Dos &rarr;</button>
+                        </div>
+                    </div>
+                    <div id="dashboardTodosPreview">
+                        <!-- Populated by renderTodos() -->
+                    </div>
+                </div>
+
             </section>
 
 
@@ -2134,30 +2159,34 @@
     </div>
 
     <!-- Mobile Sticky Bottom Nav Bar -->
-    <nav class="mobile-bottom-nav">
-        <button class="bottom-nav-btn active" id="mNav-dashboard" onclick="switchTab('dashboard')">
-            <span class="b-icon">&#128202;</span>
-            <span>Runway</span>
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <button class="bottom-nav-btn active" id="mNav-dashboard" onclick="switchTab('dashboard')" title="Dashboard">
+            <span class="b-icon">&#127968;</span>
+            <span>Home</span>
         </button>
-        <button class="bottom-nav-btn" id="mNav-campus" onclick="switchTab('campus')">
+        <button class="bottom-nav-btn" id="mNav-campus" onclick="switchTab('campus')" title="Campus Hub">
             <span class="b-icon">🎓</span>
             <span>Campus</span>
         </button>
-        <button class="bottom-nav-btn" id="mNav-transactions" onclick="switchTab('transactions')">
+        <button class="bottom-nav-btn" id="mNav-transactions" onclick="switchTab('transactions')" title="Spends & Income">
             <span class="b-icon">&#128176;</span>
             <span>Spends</span>
         </button>
-        <button class="bottom-nav-btn" id="mNav-market" onclick="switchTab('market')">
+        <button class="bottom-nav-btn" id="mNav-todos" onclick="switchTab('todos')" title="Errands & Checklist">
+            <span class="b-icon">&#9989;</span>
+            <span>To-Do</span>
+        </button>
+        <button class="bottom-nav-btn" id="mNav-debts" onclick="switchTab('debts')" title="Coursemate IOUs">
+            <span class="b-icon">&#129309;</span>
+            <span>Debts</span>
+        </button>
+        <button class="bottom-nav-btn" id="mNav-market" onclick="switchTab('market')" title="Market Prices">
             <span class="b-icon">&#128722;</span>
             <span>Market</span>
         </button>
-        <button class="bottom-nav-btn" id="mNav-debts" onclick="switchTab('debts')">
-            <span class="b-icon">&#129309;</span>
-            <span>IOU</span>
-        </button>
-        <button class="bottom-nav-btn" id="mNav-settings" onclick="switchTab('settings')">
-            <span class="b-icon">&#128190;</span>
-            <span>Backup</span>
+        <button class="bottom-nav-btn" id="mNav-settings" onclick="switchTab('settings')" title="Settings & Sync">
+            <span class="b-icon">&#9881;</span>
+            <span>Settings</span>
         </button>
     </nav>
 
@@ -3192,9 +3221,10 @@
         }
 
         function saveState() {
+            lastLocalChangeTime = Date.now();
             saveLocalStateOnly();
             if (currentUser && supabaseClient) {
-                syncStateToCloud();
+                debounceSyncStateToCloud(300);
             }
         }
 
@@ -3447,6 +3477,9 @@
 
             // Charts
             renderCharts();
+
+            // Dashboard To-Do preview
+            renderTodos();
         }
 
         function renderQuickPresets() {
@@ -4138,7 +4171,7 @@
 
                         row.innerHTML = `
                             <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px;">
-                                <input type="checkbox" ${h.paid ? 'checked' : ''} onchange="toggleHandoutPaid('${h.id}')" style="width: 22px; height: 22px; cursor: pointer; accent-color: var(--success);" title="Toggle paid state">
+                                <input type="checkbox" ${h.paid ? 'checked' : ''} onchange="event.stopPropagation(); toggleHandoutPaid('${h.id}')" style="width: 22px; height: 22px; cursor: pointer; accent-color: var(--success);" title="Toggle paid state">
                                 <div>
                                     <div style="font-weight: 700; font-size: 0.95rem; ${h.paid ? 'text-decoration: line-through; color: var(--text-muted);' : 'color: var(--text-main);'}">
                                         ${h.title}
@@ -4153,10 +4186,10 @@
                                 <span class="naira-mask" style="font-weight: 800; font-size: 0.95rem; color: ${h.paid ? 'var(--success)' : 'var(--text-main)'}; margin-right: 4px;">
                                     ${formatNaira(h.cost)}
                                 </span>
-                                <button class="btn btn-sm ${h.paid ? 'btn-outline' : 'btn-primary'}" onclick="toggleHandoutPaid('${h.id}')" style="font-size: 0.75rem; padding: 4px 10px; font-weight: 700;">
+                                <button class="btn btn-sm ${h.paid ? 'btn-outline' : 'btn-primary'}" onclick="event.stopPropagation(); toggleHandoutPaid('${h.id}')" style="font-size: 0.75rem; padding: 4px 10px; font-weight: 700;">
                                     ${h.paid ? '↩️ Mark Unpaid' : '✅ Mark Paid'}
                                 </button>
-                                <button class="btn btn-outline btn-sm" onclick="deleteHandout('${h.id}')" title="Delete Handout" style="padding: 4px 8px; color: var(--danger); border-color: var(--danger); font-size: 0.75rem;">
+                                <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); deleteHandout('${h.id}')" title="Delete Handout" style="padding: 4px 8px; color: var(--danger); border-color: var(--danger); font-size: 0.75rem;">
                                     🗑️
                                 </button>
                             </div>
@@ -4319,41 +4352,83 @@
                 return;
             }
 
-            const willBePaid = !h.paid;
-            h.paid = willBePaid;
+            const cost = parseFloat(h.cost) || 0;
 
-            if (willBePaid) {
-                const defaultWallet = appData.wallets[0] || { id: "w-main", name: "Primary Commercial Bank" };
-                let shouldLog = false;
-                try {
-                    shouldLog = typeof confirm === "function" && confirm(`Marked "${h.title}" (${formatNaira(h.cost)}) as PAID! ✅\n\nDo you want to deduct this ${formatNaira(h.cost)} from your "${defaultWallet.name}" and log it as an expense?`);
-                } catch (e) {
-                    shouldLog = false;
+            if (!h.paid) {
+                // User wants to mark as PAID
+                // 1. Calculate total spendable balance (excluding locked savings)
+                const metrics = computeMetrics();
+                const totalSpendable = metrics.totalSpendable;
+
+                if (totalSpendable < cost) {
+                    showToast(`❌ Insufficient Funds! Spendable balance (${formatNaira(totalSpendable)}) is less than due cost (${formatNaira(cost)}). Please fund your wallet.`, "danger");
+                    renderStudentCampusHub();
+                    return;
                 }
-                if (shouldLog) {
-                    const currentBal = parseFloat(defaultWallet.balance) || 0;
-                    defaultWallet.balance = Math.round((currentBal - h.cost) * 100) / 100;
-                    appData.transactions.unshift({
-                        id: generateUUID(),
-                        type: "expense",
-                        title: `Handout / Due: ${h.title}`,
-                        amount: h.cost,
-                        category: "Handouts, Manuals & Course Packs",
-                        walletId: defaultWallet.id,
-                        date: new Date().toISOString().split('T')[0]
-                    });
-                    showToast(`Marked "${h.title}" Paid & deducted ${formatNaira(h.cost)} from ${defaultWallet.name} ✅`);
-                } else {
-                    showToast(`Marked "${h.title}" as Paid! ✅`);
+
+                // 2. Debit from spendable balance (prefer commercial bank or fintech with sufficient balance)
+                let debitWallet = appData.wallets.find(w => !w.isLocked && !w.name.toLowerCase().includes("locked") && !w.tag.toLowerCase().includes("locked") && (parseFloat(w.balance) || 0) >= cost);
+                if (!debitWallet) {
+                    debitWallet = appData.wallets.find(w => !w.isLocked && !w.name.toLowerCase().includes("locked")) || appData.wallets[0];
                 }
+
+                if (debitWallet) {
+                    const currentBal = parseFloat(debitWallet.balance) || 0;
+                    debitWallet.balance = Math.max(0, Math.round((currentBal - cost) * 100) / 100);
+                }
+
+                // 3. Automatically log payment expense (NO confirm popup dialog!)
+                const txId = generateUUID();
+                h.paidTxId = txId;
+                h.paidWalletId = debitWallet ? debitWallet.id : null;
+                h.paid = true;
+
+                appData.transactions.unshift({
+                    id: txId,
+                    type: "expense",
+                    title: `Course Due: ${h.title}`,
+                    amount: cost,
+                    category: "Handouts, Manuals & Course Packs",
+                    walletId: debitWallet ? debitWallet.id : (appData.wallets[0] ? appData.wallets[0].id : null),
+                    date: new Date().toISOString().split('T')[0]
+                });
+
+                showToast(`✅ Paid ${formatNaira(cost)} for "${h.title}" (Debited from ${debitWallet ? debitWallet.name : 'Spendable Balance'})`);
             } else {
-                showToast(`Marked "${h.title}" as Unpaid ⏳`);
+                // User wants to revert back to UNPAID
+                h.paid = false;
+
+                // Refund the amount back to the wallet
+                let refundWallet = null;
+                if (h.paidWalletId) {
+                    refundWallet = appData.wallets.find(w => String(w.id) === String(h.paidWalletId));
+                }
+                if (!refundWallet) {
+                    refundWallet = appData.wallets.find(w => !w.isLocked && !w.name.toLowerCase().includes("locked")) || appData.wallets[0];
+                }
+
+                if (refundWallet) {
+                    const currentBal = parseFloat(refundWallet.balance) || 0;
+                    refundWallet.balance = Math.round((currentBal + cost) * 100) / 100;
+                }
+
+                if (h.paidTxId) {
+                    appData.transactions = appData.transactions.filter(t => String(t.id) !== String(h.paidTxId));
+                }
+
+                showToast(`↩️ Marked "${h.title}" as Unpaid (Refunded ${formatNaira(cost)} to ${refundWallet ? refundWallet.name : 'wallet'})`);
             }
 
-            saveState();
+            lastLocalChangeTime = Date.now();
+            saveLocalStateOnly();
             renderStudentCampusHub();
             renderDashboard();
             renderWallets();
+            renderTransactions();
+
+            if (currentUser && supabaseClient) {
+                debounceSyncStateToCloud(100);
+            }
         }
 
         function openHandoutModal() {
@@ -5163,39 +5238,77 @@
            -------------------------------------------------------------------------- */
         function renderTodos() {
             const container = document.getElementById("todosContainer");
-            container.innerHTML = "";
-
-            if (appData.todos.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 30px;">No errands or tasks logged. Click "+ Add To-Do".</div>`;
-                return;
+            if (container) {
+                container.innerHTML = "";
+                if (!appData.todos || appData.todos.length === 0) {
+                    container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 30px;">No errands or tasks logged. Click "+ Add To-Do".</div>`;
+                } else {
+                    appData.todos.forEach(t => {
+                        const item = document.createElement("div");
+                        item.className = "todo-item";
+                        item.innerHTML = `
+                            <div class="todo-left">
+                                <input type="checkbox" class="todo-checkbox" ${t.done ? 'checked' : ''} onchange="handleTodoCheck('${t.id}', this.checked)">
+                                <div>
+                                    <span class="todo-text ${t.done ? 'done' : ''}" style="font-weight: 600; font-size: 0.95rem;">${t.title}</span>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                        <span class="todo-tag">${t.tag}</span>
+                                        <span class="priority-${(t.priority || 'medium').toLowerCase()}">&bull; ${t.priority || 'Normal'} Priority</span>
+                                        ${t.dueDate ? `&bull; Due: ${t.dueDate}` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                ${t.estCost > 0 ? `
+                                    <span class="naira-mask" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 8px; border-radius: 6px;">
+                                        Est: ${formatNaira(t.estCost)}
+                                    </span>
+                                ` : ''}
+                                <button class="tx-delete-btn" onclick="deleteTodo('${t.id}')">&times;</button>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
             }
 
-            appData.todos.forEach(t => {
-                const item = document.createElement("div");
-                item.className = "todo-item";
-                item.innerHTML = `
-                    <div class="todo-left">
-                        <input type="checkbox" class="todo-checkbox" ${t.done ? 'checked' : ''} onchange="handleTodoCheck('${t.id}', this.checked)">
-                        <div>
-                            <span class="todo-text ${t.done ? 'done' : ''}" style="font-weight: 600; font-size: 0.95rem;">${t.title}</span>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
-                                <span class="todo-tag">${t.tag}</span>
-                                <span class="priority-${t.priority.toLowerCase()}">&bull; ${t.priority} Priority</span>
-                                ${t.dueDate ? `&bull; Due: ${t.dueDate}` : ''}
-                            </div>
+            // Render Dashboard To-Dos preview widget
+            const dashPreview = document.getElementById("dashboardTodosPreview");
+            if (dashPreview) {
+                dashPreview.innerHTML = "";
+                const pending = (appData.todos || []).filter(t => !t.done);
+                if (pending.length === 0) {
+                    dashPreview.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); padding: 14px; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px dashed var(--border);">
+                            🎉 All caught up! No pending errands or assignments. <a href="javascript:void(0)" onclick="openTodoModal()" style="color: var(--primary); font-weight: 700;">+ Add a task</a>
                         </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        ${t.estCost > 0 ? `
-                            <span class="naira-mask" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 8px; border-radius: 6px;">
-                                Est: ${formatNaira(t.estCost)}
-                            </span>
-                        ` : ''}
-                        <button class="tx-delete-btn" onclick="deleteTodo('${t.id}')">&times;</button>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
+                    `;
+                } else {
+                    const topItems = pending.slice(0, 3);
+                    topItems.forEach(t => {
+                        const row = document.createElement("div");
+                        row.style.display = "flex";
+                        row.style.justifyContent = "space-between";
+                        row.style.alignItems = "center";
+                        row.style.padding = "8px 12px";
+                        row.style.marginBottom = "6px";
+                        row.style.background = "var(--surface-subtle)";
+                        row.style.border = "1px solid var(--border)";
+                        row.style.borderRadius = "var(--radius-sm)";
+                        row.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" onchange="handleTodoCheck('${t.id}', this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+                                <div>
+                                    <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main);">${t.title}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted);">${t.tag || 'Task'} &bull; ${t.priority || 'Normal'} Priority</div>
+                                </div>
+                            </div>
+                            ${t.estCost > 0 ? `<span class="naira-mask" style="font-size: 0.82rem; font-weight: 700; color: var(--primary);">${formatNaira(t.estCost)}</span>` : ''}
+                        `;
+                        dashPreview.appendChild(row);
+                    });
+                }
+            }
         }
 
         function handleTodoCheck(id, isChecked) {
@@ -5786,9 +5899,9 @@
                 cat = "Power & Utilities";
             }
 
-            targetWallet.balance -= amt;
+            targetWallet.balance = Math.max(0, Math.round((targetWallet.balance - amt) * 100) / 100);
             appData.transactions.unshift({
-                id: "tx-" + Date.now(),
+                id: generateUUID(),
                 type: "expense",
                 title: title,
                 amount: amt,
@@ -5801,7 +5914,9 @@
             amtInput.value = "";
             saveState();
             renderDashboard();
-            showToast(`Logged: "${title}" (${formatNaira(amt)}) from ${targetWallet.name}`);
+            renderWallets();
+            renderTransactions();
+            showToast(`Logged: "${title}" (${formatNaira(amt)}) from ${targetWallet.name} ✅`);
         }
 
         function filterQuickPresets(query) {
@@ -6000,6 +6115,10 @@
 
                 container.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 6px;">
+                        <div id="headerSyncStatus" style="font-size: 0.72rem;"></div>
+                        <button class="btn btn-outline btn-sm" onclick="loadUserDataFromCloud(true)" title="Sync Cross-Device Data with Cloud SQL" style="padding: 4px 8px; font-size: 0.72rem; display: inline-flex; align-items: center; gap: 3px; border-radius: 8px;">
+                            <span>🔄</span> <span class="hide-on-mobile">Sync</span>
+                        </button>
                         <div class="dropdown-wrap" id="userMenuWrap" style="position: relative;">
                             <button class="btn-icon" onclick="toggleUserDropdown(event)" style="width: auto; padding: 0 10px; gap: 5px; font-weight: 700; font-size: 0.78rem; background: var(--surface-subtle); border-color: var(--primary);" title="Account & Sync">
                                 <span>👤</span> <span id="headerUserDisplayName">${name}</span> <span style="font-size: 0.6rem;">▼</span>
@@ -6225,12 +6344,22 @@
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (!error && data && data.user) {
                         setCurrentUserSession(data.user);
-                        restoreUserAccountData(data.user);
                         renderHeaderAuthPill();
                         showMainApp();
                         const name = (data.user.user_metadata && data.user.user_metadata.full_name) || data.user.email;
-                        showToast(`Welcome back, ${name}! (Cloud SQL Synced)`);
+                        showToast(`Welcome back, ${name}! (Syncing Cloud Data 🟢)`);
+
+                        // Check if this device has existing local data that needs to be migrated to cloud
+                        const hasLocalData = appData.transactions.length > 0 || (appData.student && appData.student.handouts && appData.student.handouts.length > 0);
+
+                        // Load user cloud data to ensure exact parity across phone and laptop
                         await loadUserDataFromCloud(false);
+
+                        // If cloud was blank but device had local data, push it up
+                        if (appData.transactions.length === 0 && hasLocalData) {
+                            await syncStateToCloud(true);
+                        }
+
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.textContent = "Sign In to Account";
@@ -6246,9 +6375,36 @@
                             }
                             return;
                         } else if (error.message.toLowerCase().includes("invalid login credentials")) {
+                            // Check if this user exists in local accounts and migrate to Supabase
                             const accounts = getLocalAccounts();
                             const localAcc = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
-                            if (!localAcc) {
+                            if (localAcc && localAcc.password === password) {
+                                // Attempt auto-migration of local account to Cloud SQL
+                                try {
+                                    await supabaseClient.auth.signUp({
+                                        email,
+                                        password,
+                                        options: { data: { full_name: localAcc.fullName, campus: localAcc.campus } }
+                                    });
+                                    const retry = await supabaseClient.auth.signInWithPassword({ email, password });
+                                    if (retry.data && retry.data.user) {
+                                        localAcc.id = retry.data.user.id;
+                                        saveLocalAccounts(accounts);
+                                        setCurrentUserSession(retry.data.user);
+                                        renderHeaderAuthPill();
+                                        showMainApp();
+                                        showToast(`Account linked to Cloud SQL! 🟢`);
+                                        await syncStateToCloud(true);
+                                        if (submitBtn) {
+                                            submitBtn.disabled = false;
+                                            submitBtn.textContent = "Sign In to Account";
+                                        }
+                                        return;
+                                    }
+                                } catch (migErr) {
+                                    console.warn("Auto-migration error:", migErr);
+                                }
+                            } else if (!localAcc) {
                                 setAuthAlert("❌ Incorrect email or password. Please verify and try again.");
                                 if (submitBtn) {
                                     submitBtn.disabled = false;
@@ -6363,17 +6519,52 @@
                         return;
                     }
 
-                    if (data.session && data.user) {
-                        setCurrentUserSession(data.user);
-                        appData = getCleanDefaultAppData();
+                    let activeUser = data.user;
+                    let activeSession = data.session;
+
+                    if (!activeSession) {
+                        try {
+                            const autoLogin = await supabaseClient.auth.signInWithPassword({ email, password });
+                            if (autoLogin.data && autoLogin.data.session) {
+                                activeSession = autoLogin.data.session;
+                                activeUser = autoLogin.data.user;
+                            }
+                        } catch (e) {}
+                    }
+
+                    if (activeUser) {
+                        setCurrentUserSession(activeUser);
+                        // Save to local accounts with cloud UUID so offline fallback shares same ID
+                        const accounts = getLocalAccounts();
+                        const existingIdx = accounts.findIndex(a => a.email.toLowerCase() === email.toLowerCase());
+                        const accData = {
+                            id: activeUser.id,
+                            fullName: name,
+                            campus: campus || "Campus",
+                            email: email,
+                            password: password,
+                            createdAt: new Date().toISOString()
+                        };
+                        if (existingIdx >= 0) accounts[existingIdx] = accData;
+                        else accounts.push(accData);
+                        saveLocalAccounts(accounts);
+
+                        // If user already created data in current session, preserve it! Otherwise defaults
+                        if (!appData.transactions || appData.transactions.length === 0) {
+                            appData = getCleanDefaultAppData();
+                        }
                         saveLocalStateOnly();
                         renderHeaderAuthPill();
                         showMainApp();
-                        showToast(`Welcome to NairaFlow, ${name}! Your Cloud SQL account is active.`);
+                        showToast(`Welcome to NairaFlow, ${name}! Cloud SQL is active 🟢`);
                         await syncStateToCloud(true);
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = "Create Free Account";
+                        }
                         return;
                     } else {
-                        setAuthAlert("🎉 Cloud account registered! Please check your email to confirm, then sign in.", true);
+                        setAuthAlert("🎉 Cloud account registered! Please click 'Sign In' above to enter your account.", true);
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.textContent = "Create Free Account";
@@ -6635,32 +6826,87 @@
         }
 
         /* --------------------------------------------------------------------------
-           TWO-WAY CLOUD SQL DATABASE DATA SYNC & AUTOMATIC REFRESH
+           TWO-WAY CLOUD SQL DATABASE DATA SYNC & AUTOMATIC REFRESH (PARALLELIZED & REAL-TIME)
            -------------------------------------------------------------------------- */
+        let lastLocalChangeTime = 0;
+        let cloudSyncTimeout = null;
+
+        function debounceSyncStateToCloud(delay = 300) {
+            if (cloudSyncTimeout) clearTimeout(cloudSyncTimeout);
+            cloudSyncTimeout = setTimeout(() => {
+                syncStateToCloud();
+            }, delay);
+        }
+
+        function showSyncIndicator(isSyncing) {
+            const el = document.getElementById("headerSyncStatus");
+            if (el) {
+                if (isSyncing) {
+                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-size: 0.72rem; font-weight: 700;">🔄 Syncing...</span>`;
+                } else if (currentUser && supabaseClient) {
+                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--success); font-size: 0.72rem; font-weight: 700;">🟢 Live Synced</span>`;
+                } else {
+                    el.innerHTML = ``;
+                }
+            }
+        }
+
         async function loadUserDataFromCloud(showToastFeedback = true) {
             if (!supabaseClient || !currentUser || !isValidUUID(currentUser.id)) return;
+            // Prevent overwriting local changes made within the last 5 seconds
+            if (Date.now() - lastLocalChangeTime < 5000 && !showToastFeedback) return;
+
+            showSyncIndicator(true);
             try {
-                // 0. Profile & Allowance Settings
-                try {
-                    const { data: profileData } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-                    if (profileData) {
-                        if (!appData.student) appData.student = {};
-                        if (profileData.allowance_amount !== undefined && profileData.allowance_amount !== null) {
-                            appData.student.allowanceAmount = parseFloat(profileData.allowance_amount) || 0;
-                        }
-                        if (profileData.expected_allowance_day) {
-                            appData.student.expectedAllowanceDay = parseInt(profileData.expected_allowance_day) || 28;
-                        }
+                const todayDate = new Date().toISOString().split('T')[0];
+
+                // Fetch all cloud tables in PARALLEL using Promise.allSettled for maximum speed
+                const [
+                    profileRes,
+                    walletsRes,
+                    txRes,
+                    handoutsRes,
+                    sinkingRes,
+                    debtsRes,
+                    mealRes,
+                    plateRes
+                ] = await Promise.allSettled([
+                    supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+                    supabaseClient.from('wallets').select('*'),
+                    supabaseClient.from('transactions').select('*').order('date', { ascending: false }).limit(100),
+                    supabaseClient.from('campus_handouts').select('*'),
+                    supabaseClient.from('campus_sinking_funds').select('*'),
+                    supabaseClient.from('debts').select('*'),
+                    supabaseClient.from('daily_meal_spends').select('*').eq('date', todayDate).maybeSingle(),
+                    supabaseClient.from('calorie_plate_items').select('*').eq('logged_date', todayDate)
+                ]);
+
+                // 0. Profile & Allowance & To-Dos
+                if (profileRes.status === 'fulfilled' && profileRes.value && profileRes.value.data) {
+                    const profileData = profileRes.value.data;
+                    if (!appData.student) appData.student = {};
+                    if (profileData.allowance_amount !== undefined && profileData.allowance_amount !== null) {
+                        appData.student.allowanceAmount = parseFloat(profileData.allowance_amount) || 0;
                     }
-                } catch (profErr) {
-                    console.warn("Profile load error:", profErr);
+                    if (profileData.expected_allowance_day) {
+                        appData.student.expectedAllowanceDay = parseInt(profileData.expected_allowance_day) || 28;
+                    }
+                    if (profileData.institution) {
+                        try {
+                            const extra = JSON.parse(profileData.institution);
+                            if (extra && extra.todos && Array.isArray(extra.todos)) {
+                                appData.todos = extra.todos;
+                            }
+                            if (extra && extra.quickPresets && Array.isArray(extra.quickPresets)) {
+                                appData.quickPresets = extra.quickPresets;
+                            }
+                        } catch (e) {}
+                    }
                 }
 
                 // 1. Wallets
-                const { data: walletsData, error: wErr } = await supabaseClient.from('wallets').select('*');
-                if (wErr) console.error("Load wallets error:", wErr);
-                if (walletsData && walletsData.length > 0) {
-                    appData.wallets = walletsData.map(w => ({
+                if (walletsRes.status === 'fulfilled' && walletsRes.value && walletsRes.value.data && walletsRes.value.data.length > 0) {
+                    appData.wallets = walletsRes.value.data.map(w => ({
                         id: w.id,
                         name: w.name,
                         bankName: w.bank_name || w.name,
@@ -6668,16 +6914,13 @@
                         tag: w.tag || 'Commercial Bank',
                         isLocked: !!w.is_locked
                     }));
-                } else {
-                    // Seed initial user wallets if completely blank in DB
-                    await syncStateToCloud();
+                } else if (!appData.wallets || appData.wallets.length === 0) {
+                    syncStateToCloud();
                 }
 
                 // 2. Transactions
-                const { data: txData, error: txErr } = await supabaseClient.from('transactions').select('*').order('date', { ascending: false });
-                if (txErr) console.error("Load transactions error:", txErr);
-                if (txData && txData.length > 0) {
-                    appData.transactions = txData.map(t => ({
+                if (txRes.status === 'fulfilled' && txRes.value && txRes.value.data && txRes.value.data.length > 0) {
+                    appData.transactions = txRes.value.data.map(t => ({
                         id: t.id,
                         walletId: t.wallet_id,
                         type: t.type,
@@ -6688,11 +6931,10 @@
                     }));
                 }
 
-                // 3. Handouts
-                const { data: handoutsData } = await supabaseClient.from('campus_handouts').select('*');
-                if (handoutsData && handoutsData.length > 0) {
+                // 3. Handouts & Dues
+                if (handoutsRes.status === 'fulfilled' && handoutsRes.value && handoutsRes.value.data && handoutsRes.value.data.length > 0) {
                     if (!appData.student) appData.student = {};
-                    appData.student.handouts = handoutsData.map(h => ({
+                    appData.student.handouts = handoutsRes.value.data.map(h => ({
                         id: h.id,
                         title: h.title,
                         cost: parseFloat(h.cost) || 0,
@@ -6702,10 +6944,9 @@
                 }
 
                 // 4. Sinking Funds
-                const { data: sinkingData } = await supabaseClient.from('campus_sinking_funds').select('*');
-                if (sinkingData && sinkingData.length > 0) {
+                if (sinkingRes.status === 'fulfilled' && sinkingRes.value && sinkingRes.value.data && sinkingRes.value.data.length > 0) {
                     if (!appData.student) appData.student = {};
-                    appData.student.sinkingFunds = sinkingData.map(sf => ({
+                    appData.student.sinkingFunds = sinkingRes.value.data.map(sf => ({
                         id: sf.id,
                         title: sf.title,
                         targetAmount: parseFloat(sf.target_amount) || 0,
@@ -6716,9 +6957,8 @@
                 }
 
                 // 5. Daily Meal Spends
-                const todayDate = new Date().toISOString().split('T')[0];
-                const { data: mealData } = await supabaseClient.from('daily_meal_spends').select('*').eq('date', todayDate).maybeSingle();
-                if (mealData) {
+                if (mealRes.status === 'fulfilled' && mealRes.value && mealRes.value.data) {
+                    const mealData = mealRes.value.data;
                     appData.dailyMeals = {
                         breakfast: parseFloat(mealData.breakfast) || 0,
                         lunch: parseFloat(mealData.lunch) || 0,
@@ -6728,18 +6968,16 @@
                 }
 
                 // 6. Calorie Plate
-                const { data: plateData } = await supabaseClient.from('calorie_plate_items').select('*').eq('logged_date', todayDate);
-                if (plateData && plateData.length > 0) {
-                    appData.todayPlate = plateData.map(p => ({
+                if (plateRes.status === 'fulfilled' && plateRes.value && plateRes.value.data && plateRes.value.data.length > 0) {
+                    appData.todayPlate = plateRes.value.data.map(p => ({
                         foodId: p.food_id,
                         qty: parseFloat(p.quantity) || 1
                     }));
                 }
 
-                // 7. Debts
-                const { data: debtsData } = await supabaseClient.from('debts').select('*');
-                if (debtsData && debtsData.length > 0) {
-                    appData.debts = debtsData.map(d => ({
+                // 7. Debts & IOUs
+                if (debtsRes.status === 'fulfilled' && debtsRes.value && debtsRes.value.data && debtsRes.value.data.length > 0) {
+                    appData.debts = debtsRes.value.data.map(d => ({
                         id: d.id,
                         person: d.person,
                         amount: parseFloat(d.amount) || 0,
@@ -6753,6 +6991,7 @@
                 saveLocalStateOnly();
                 renderDashboard();
                 renderStudentCampusHub();
+                renderWallets();
                 renderTransactions();
                 renderMarketStaples();
                 renderBillsAndEstimators();
@@ -6763,53 +7002,49 @@
                     showToast("Synced with Cloud SQL! 🟢");
                 }
             } catch (err) {
-                console.error("Cloud SQL load error:", err);
+                console.warn("Cloud SQL load warning:", err);
+            } finally {
+                showSyncIndicator(false);
             }
         }
 
-        // Automatic Background Sync: Refresh when user switches back to the tab or unlocks phone
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible" && currentUser && supabaseClient) {
-                loadUserDataFromCloud(false);
-            }
-        });
-
-        window.addEventListener("focus", () => {
-            if (currentUser && supabaseClient) {
-                loadUserDataFromCloud(false);
-            }
-        });
-
-        // Periodic background auto-refresh every 20 seconds while user is active
+        // Automatic Background Cross-Device Sync Poller: Refresh every 8 seconds if active
         setInterval(() => {
-            if (document.visibilityState === "visible" && currentUser && supabaseClient) {
-                loadUserDataFromCloud(false);
+            if (document.visibilityState === "visible" && currentUser && supabaseClient && isValidUUID(currentUser.id)) {
+                if (Date.now() - lastLocalChangeTime > 5000 && !isCloudSyncing) {
+                    loadUserDataFromCloud(false);
+                }
             }
-        }, 20000);
+        }, 8000);
 
         async function syncStateToCloud(forceAll = false) {
             if (!supabaseClient || !currentUser || !isValidUUID(currentUser.id)) return;
             if (isCloudSyncing) return;
             isCloudSyncing = true;
+            showSyncIndicator(true);
 
             try {
-                // 0. Upsert User Profile & Allowance Settings
-                if (appData.student) {
-                    try {
-                        await supabaseClient.from('profiles').upsert({
-                            id: currentUser.id,
-                            email: currentUser.email,
-                            full_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || '',
-                            institution: (currentUser.user_metadata && currentUser.user_metadata.campus) || '',
-                            student_mode: !!appData.student.enabled,
-                            allowance_amount: parseFloat(appData.student.allowanceAmount) || 0,
-                            expected_allowance_day: parseInt(appData.student.expectedAllowanceDay) || 28,
-                            updated_at: new Date().toISOString()
-                        }, { onConflict: 'id' });
-                    } catch (profSyncErr) {
-                        console.warn("Profile sync error:", profSyncErr);
-                    }
-                }
+                const syncPromises = [];
+
+                // 0. Upsert User Profile & Allowance Settings & To-Dos
+                const extraData = {
+                    campus: (currentUser.user_metadata && currentUser.user_metadata.campus) || '',
+                    todos: appData.todos || [],
+                    quickPresets: appData.quickPresets || []
+                };
+
+                syncPromises.push(
+                    supabaseClient.from('profiles').upsert({
+                        id: currentUser.id,
+                        email: currentUser.email,
+                        full_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || '',
+                        institution: JSON.stringify(extraData),
+                        student_mode: !!(appData.student && appData.student.enabled),
+                        allowance_amount: parseFloat((appData.student && appData.student.allowanceAmount) || 0),
+                        expected_allowance_day: parseInt((appData.student && appData.student.expectedAllowanceDay) || 28),
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'id' })
+                );
 
                 // 1. Upsert Wallets
                 if (appData.wallets && appData.wallets.length > 0) {
@@ -6825,8 +7060,7 @@
                             is_locked: !!w.isLocked
                         };
                     });
-                    const { error: wErr } = await supabaseClient.from('wallets').upsert(walletRows, { onConflict: 'id' });
-                    if (wErr) console.error("Wallet sync error:", wErr.message);
+                    syncPromises.push(supabaseClient.from('wallets').upsert(walletRows, { onConflict: 'id' }));
                 }
 
                 // 2. Upsert Transactions
@@ -6850,11 +7084,10 @@
                             date: t.date || new Date().toISOString().split('T')[0]
                         };
                     });
-                    const { error: txErr } = await supabaseClient.from('transactions').upsert(txRows, { onConflict: 'id' });
-                    if (txErr) console.error("Transaction sync error:", txErr.message);
+                    syncPromises.push(supabaseClient.from('transactions').upsert(txRows, { onConflict: 'id' }));
                 }
 
-                // 3. Upsert Handouts
+                // 3. Upsert Handouts & Dues
                 if (appData.student && appData.student.handouts && appData.student.handouts.length > 0) {
                     const handoutRows = appData.student.handouts.map(h => {
                         if (!isValidUUID(h.id)) h.id = generateUUID();
@@ -6867,8 +7100,7 @@
                             due_date: h.dueDate || null
                         };
                     });
-                    const { error: hErr } = await supabaseClient.from('campus_handouts').upsert(handoutRows, { onConflict: 'id' });
-                    if (hErr) console.error("Handouts sync error:", hErr.message);
+                    syncPromises.push(supabaseClient.from('campus_handouts').upsert(handoutRows, { onConflict: 'id' }));
                 }
 
                 // 4. Upsert Sinking Funds
@@ -6885,8 +7117,7 @@
                             icon: sf.icon || '🏠'
                         };
                     });
-                    const { error: sfErr } = await supabaseClient.from('campus_sinking_funds').upsert(fundRows, { onConflict: 'id' });
-                    if (sfErr) console.error("Sinking fund sync error:", sfErr.message);
+                    syncPromises.push(supabaseClient.from('campus_sinking_funds').upsert(fundRows, { onConflict: 'id' }));
                 }
 
                 // 5. Upsert Debts
@@ -6904,37 +7135,25 @@
                             status: d.status || 'unpaid'
                         };
                     });
-                    const { error: dErr } = await supabaseClient.from('debts').upsert(debtRows, { onConflict: 'id' });
-                    if (dErr) console.error("Debts sync error:", dErr.message);
+                    syncPromises.push(supabaseClient.from('debts').upsert(debtRows, { onConflict: 'id' }));
                 }
 
                 // 6. Upsert Daily Meals
                 if (appData.dailyMeals) {
                     const todayDate = new Date().toISOString().split('T')[0];
-                    const { error: mErr } = await supabaseClient.from('daily_meal_spends').upsert({
-                        user_id: currentUser.id,
-                        date: todayDate,
-                        breakfast: parseFloat(appData.dailyMeals.breakfast) || 0,
-                        lunch: parseFloat(appData.dailyMeals.lunch) || 0,
-                        dinner: parseFloat(appData.dailyMeals.dinner) || 0
-                    }, { onConflict: 'user_id,date' });
-                    if (mErr) console.error("Meal sync error:", mErr.message);
+                    syncPromises.push(
+                        supabaseClient.from('daily_meal_spends').upsert({
+                            user_id: currentUser.id,
+                            date: todayDate,
+                            breakfast: parseFloat(appData.dailyMeals.breakfast) || 0,
+                            lunch: parseFloat(appData.dailyMeals.lunch) || 0,
+                            dinner: parseFloat(appData.dailyMeals.dinner) || 0
+                        }, { onConflict: 'user_id,date' })
+                    );
                 }
 
-                // 7. Upsert Today's Calorie Plate
-                if (appData.todayPlate && appData.todayPlate.length > 0) {
-                    const todayDate = new Date().toISOString().split('T')[0];
-                    const plateRows = appData.todayPlate.map(p => ({
-                        id: generateUUID(),
-                        user_id: currentUser.id,
-                        food_id: p.foodId,
-                        quantity: parseFloat(p.qty) || 1,
-                        logged_date: todayDate
-                    }));
-                    await supabaseClient.from('calorie_plate_items').delete().eq('user_id', currentUser.id).eq('logged_date', todayDate);
-                    const { error: pErr } = await supabaseClient.from('calorie_plate_items').insert(plateRows);
-                    if (pErr) console.error("Plate sync error:", pErr.message);
-                }
+                // Execute all cloud sync promises in PARALLEL
+                await Promise.allSettled(syncPromises);
 
                 if (forceAll) {
                     showToast("Cloud SQL backup complete! 🟢");
@@ -6943,6 +7162,7 @@
                 console.warn("Cloud SQL sync warning:", err);
             } finally {
                 isCloudSyncing = false;
+                showSyncIndicator(false);
             }
         }
 
