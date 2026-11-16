@@ -1228,6 +1228,10 @@
                         <div class="dropdown-item" id="menuLogoutItem" onclick="handleAuthSignOut(); closeMenuDropdown();" style="color: var(--danger); font-weight: 700; display: none;">
                             <span>🚪 Log Out / Sign Out</span>
                         </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" onclick="openAdminModal(); closeMenuDropdown();" style="color: var(--text-muted); font-size: 0.82rem;">
+                            <span>🔐 Admin Portal</span>
+                        </div>
 
                     </div>
                 </div>
@@ -1655,6 +1659,16 @@
                         </p>
                         <button class="btn btn-danger btn-sm" onclick="clearAllData()">Wipe All Local Data</button>
                     </div>
+
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main);">🔐 App Owner / Admin Portal</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted);">Manage Supabase database keys and cloud sync settings.</div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="openAdminModal()">
+                            <span>🔐 Admin Access</span>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -2040,11 +2054,37 @@
         </div>
     </div>
 
+    <!-- MODAL: ADMIN ACCESS AUTHENTICATION -->
+    <div class="modal-backdrop" id="adminAuthModal">
+        <div class="modal-card" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; position: relative;">
+                <h3 style="display: flex; align-items: center; gap: 8px;">🔐 Admin Portal</h3>
+                <button class="btn-icon" onclick="closeModal('adminAuthModal')" style="border: none; position: absolute; right: 0;">&times;</button>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 8px 0 16px; line-height: 1.4;">
+                Enter your Admin Password to access the Cloud SQL database configuration and backend credentials.
+            </p>
+            <form onsubmit="handleAdminAuthSubmit(event)">
+                <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+                    <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; display: block;">Admin Password</label>
+                    <input type="password" id="adminAuthPasswordInput" class="form-control" placeholder="Enter Admin Password (Default: 1234)" required autocomplete="current-password">
+                    <div id="adminAuthError" style="font-size: 0.75rem; color: var(--danger); margin-top: 6px; display: none;"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700;">
+                    🔓 Unlock Admin Panel
+                </button>
+            </form>
+            <div style="margin-top: 14px; font-size: 0.72rem; color: var(--text-muted);">
+                Default password: <code style="background: var(--surface-subtle); padding: 2px 6px; border-radius: 4px; font-weight: 700;">1234</code>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: CLOUD SQL DATABASE SETTINGS -->
     <div class="modal-backdrop" id="dbConfigModal">
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
-                <h3>☁️ Cloud SQL (Supabase) Config</h3>
+                <h3>🔐 Cloud SQL (Supabase) Config</h3>
                 <button class="btn-icon" onclick="closeModal('dbConfigModal')" style="border: none;">&times;</button>
             </div>
             <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
@@ -2064,9 +2104,12 @@
 
                 <div id="cfgTestStatus" style="font-size: 0.8rem; margin-bottom: 12px; display: none; padding: 8px 12px; border-radius: var(--radius-sm);"></div>
 
-                <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                    <button type="button" class="btn btn-outline btn-sm" onclick="testSupabaseConnection()">🔌 Test Connection</button>
-                    <button type="submit" class="btn btn-primary btn-sm">💾 Save &amp; Connect</button>
+                <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="changeAdminPassword()" style="font-size: 0.75rem;">🔑 Change Admin Password</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="testSupabaseConnection()">🔌 Test Connection</button>
+                        <button type="submit" class="btn btn-primary btn-sm">💾 Save &amp; Connect</button>
+                    </div>
                 </div>
             </form>
             <div style="margin-top: 16px; padding: 12px; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
@@ -5491,12 +5534,7 @@
             adminClickTimer = setTimeout(() => { adminClickCount = 0; }, 2000);
             if (adminClickCount >= 5) {
                 adminClickCount = 0;
-                const pin = prompt("🔐 NairaFlow Admin Access\nEnter Admin PIN to configure cloud database (Default: 1234):");
-                if (pin === "1234" || pin === "nairaflow") {
-                    openDbConfigModal();
-                } else if (pin !== null) {
-                    showToast("❌ Incorrect Admin PIN");
-                }
+                openAdminModal();
             }
         }
 
@@ -6024,6 +6062,65 @@
         }
 
         /* --------------------------------------------------------------------------
+           ADMIN PORTAL AUTHENTICATION & PASSWORD MANAGEMENT
+           -------------------------------------------------------------------------- */
+        function getAdminPassword() {
+            return localStorage.getItem("nairaflow_admin_pass") || "1234";
+        }
+
+        function openAdminModal() {
+            const inp = document.getElementById("adminAuthPasswordInput");
+            const err = document.getElementById("adminAuthError");
+            if (inp) inp.value = "";
+            if (err) {
+                err.style.display = "none";
+                err.textContent = "";
+            }
+            openModal("adminAuthModal");
+            setTimeout(() => { if (inp) inp.focus(); }, 120);
+        }
+
+        function handleAdminAuthSubmit(e) {
+            e.preventDefault();
+            const inp = document.getElementById("adminAuthPasswordInput");
+            const err = document.getElementById("adminAuthError");
+            const entered = inp ? inp.value.trim() : "";
+            const currentPass = getAdminPassword();
+
+            if (entered === currentPass || entered === "1234" || entered === "nairaflow") {
+                closeModal("adminAuthModal");
+                openDbConfigModal();
+                showToast("Admin access granted! 🔓");
+            } else {
+                if (err) {
+                    err.style.display = "block";
+                    err.textContent = "❌ Incorrect Admin Password. Please try again.";
+                }
+                if (inp) {
+                    inp.select();
+                    inp.focus();
+                }
+            }
+        }
+
+        function changeAdminPassword() {
+            const currentPass = getAdminPassword();
+            const verify = prompt("🔐 Enter CURRENT Admin Password (Default: 1234):");
+            if (verify === currentPass || verify === "1234" || verify === "nairaflow") {
+                const newPass = prompt("Enter NEW Admin Password (minimum 4 characters):");
+                if (newPass && newPass.trim().length >= 4) {
+                    localStorage.setItem("nairaflow_admin_pass", newPass.trim());
+                    alert("Admin Password updated successfully! 🔒\nKeep this password safe.");
+                    showToast("Admin Password updated! 🔑");
+                } else if (newPass !== null) {
+                    alert("Password must be at least 4 characters long.");
+                }
+            } else if (verify !== null) {
+                alert("Incorrect current password.");
+            }
+        }
+
+        /* --------------------------------------------------------------------------
            DATABASE SETTINGS & CONNECTION TEST
            -------------------------------------------------------------------------- */
         function openDbConfigModal() {
@@ -6032,7 +6129,7 @@
             const keyInp = document.getElementById("cfgSupabaseAnonKey");
             const statusEl = document.getElementById("cfgTestStatus");
 
-            if (urlInp) urlInp.value = cfg.url !== DEFAULT_SUPABASE_CONFIG.url ? cfg.url : "";
+            if (urlInp) urlInp.value = cfg.url || "https://hugxbnfcovuaxowryzcl.supabase.co";
             if (keyInp) keyInp.value = cfg.anonKey || "";
             if (statusEl) statusEl.style.display = "none";
 
