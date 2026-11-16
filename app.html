@@ -5890,6 +5890,28 @@
                         return;
                     } else if (error) {
                         console.warn("Supabase auth error:", error.message);
+                        if (error.message.toLowerCase().includes("email not confirmed")) {
+                            setAuthAlert("📧 <strong>Account created, but email not confirmed!</strong><br>Supabase sent a confirmation link to <strong>" + email + "</strong>. Please check your inbox (or spam folder) to activate it, then click Sign In.<br><br><small style='font-weight: 600;'>💡 Tip: To let users log in instantly without checking email, turn OFF 'Confirm email' in Supabase &rarr; Authentication &rarr; Providers &rarr; Email.</small>");
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = "Sign In to Account";
+                            }
+                            return;
+                        } else if (error.message.toLowerCase().includes("invalid login credentials")) {
+                            setAuthAlert("❌ Incorrect email or password. Please verify and try again.");
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = "Sign In to Account";
+                            }
+                            return;
+                        } else {
+                            setAuthAlert("⚠️ " + error.message);
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = "Sign In to Account";
+                            }
+                            return;
+                        }
                     }
                 } catch (err) {
                     console.warn("Supabase sign in failed:", err);
