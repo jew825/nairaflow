@@ -3006,8 +3006,12 @@
         /* --------------------------------------------------------------------------
            LOCALSTORAGE PERSISTENCE (STARTS 100% BLANK WITH 0.00 NAIRA ON LAUNCH)
            -------------------------------------------------------------------------- */
-        function saveState() {
+        function saveLocalStateOnly() {
             localStorage.setItem("nairaflow_db_v2", JSON.stringify(appData));
+        }
+
+        function saveState() {
+            saveLocalStateOnly();
             if (currentUser && supabaseClient) {
                 syncStateToCloud();
             }
@@ -6214,9 +6218,9 @@
         }
 
         /* --------------------------------------------------------------------------
-           TWO-WAY CLOUD SQL DATABASE DATA SYNC
+           TWO-WAY CLOUD SQL DATABASE DATA SYNC & AUTOMATIC REFRESH
            -------------------------------------------------------------------------- */
-        async function loadUserDataFromCloud() {
+        async function loadUserDataFromCloud(showToastFeedback = true) {
             if (!supabaseClient || !currentUser) return;
             try {
                 // 1. Wallets
@@ -6308,15 +6312,37 @@
                     }));
                 }
 
-                saveState(); // Update offline cache
+                saveLocalStateOnly(); // Update offline cache without triggering a redundant syncStateToCloud!
                 renderDashboard();
                 renderStudentCampusHub();
                 renderTransactions();
-                showToast("Synced with Cloud SQL! 🟢");
+                if (showToastFeedback) {
+                    showToast("Synced with Cloud SQL! 🟢");
+                }
             } catch (err) {
                 console.error("Cloud SQL load error:", err);
             }
         }
+
+        // Automatic Background Sync: Refresh when user switches back to the tab or unlocks phone
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible" && currentUser && supabaseClient) {
+                loadUserDataFromCloud(false);
+            }
+        });
+
+        window.addEventListener("focus", () => {
+            if (currentUser && supabaseClient) {
+                loadUserDataFromCloud(false);
+            }
+        });
+
+        // Periodic background auto-refresh every 20 seconds while user is active
+        setInterval(() => {
+            if (document.visibilityState === "visible" && currentUser && supabaseClient) {
+                loadUserDataFromCloud(false);
+            }
+        }, 20000);
 
         async function syncStateToCloud(forceAll = false) {
             if (!supabaseClient || !currentUser) return;
