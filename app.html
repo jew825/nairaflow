@@ -1160,6 +1160,58 @@
                 display: none !important;
             }
         }
+
+        /* App Container & Standalone Auth Screen */
+        #appContainer {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .standalone-auth-wrapper {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+            box-sizing: border-box;
+            background: var(--surface-subtle);
+        }
+
+        .standalone-auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+            position: relative;
+            animation: authFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin: auto 0;
+        }
+
+        @keyframes authFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.97) translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .standalone-auth-card {
+                padding: 24px 18px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1167,6 +1219,117 @@
     <!-- Toast Component -->
     <div id="appToast" class="toast">Notification</div>
 
+    <!-- STANDALONE AUTHENTICATION PAGE (DEDICATED FULL-SCREEN LOGIN & SIGN UP) -->
+    <div id="standaloneAuthScreen" class="standalone-auth-wrapper" style="display: none;">
+        <div class="standalone-auth-card">
+            <!-- Top bar: Logo & Theme Toggle -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: inline-flex; align-items: center; gap: 8px;">
+                    <div class="logo-flag" onclick="handleAdminLogoClick()" title="NairaFlow" style="cursor: pointer;">&#8358;</div>
+                    <div>
+                        <span style="font-weight: 800; font-size: 1.15rem; color: var(--text-main); letter-spacing: -0.5px;">NairaFlow</span>
+                        <span class="brand-pill" style="margin-left: 4px; font-size: 0.65rem;">🎓 Campus</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" style="width: 34px; height: 34px;">
+                        <span class="themeIconAuth">&#9790;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; letter-spacing: -0.3px;">
+                    Student Budget & Sapa Tracker
+                </h2>
+                <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin: 0;">
+                    Sign in to manage your campus allowances, food funds, and course handouts safely synced to the cloud.
+                </p>
+            </div>
+
+            <!-- Tab Switcher (Sign In vs Create Account) -->
+            <div style="display: flex; background: var(--surface-subtle); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 18px;">
+                <button type="button" id="tabAuthSignInBtn" class="btn btn-sm active" onclick="switchAuthTab('signin')" style="flex: 1; border-radius: 6px; font-weight: 700; padding: 8px; font-size: 0.85rem;">
+                    🔑 Sign In
+                </button>
+                <button type="button" id="tabAuthSignUpBtn" class="btn btn-sm" onclick="switchAuthTab('signup')" style="flex: 1; border-radius: 6px; font-weight: 700; padding: 8px; font-size: 0.85rem; background: transparent; border: none; color: var(--text-muted);">
+                    ✨ Create Account
+                </button>
+            </div>
+
+            <!-- Alert message for errors / success -->
+            <div id="authAlertBox" style="display: none; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.84rem; margin-bottom: 16px; line-height: 1.45;"></div>
+
+            <!-- SIGN IN FORM -->
+            <form id="authSignInForm" onsubmit="handleAuthSignIn(event)">
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label style="font-size: 0.82rem; font-weight: 700; margin-bottom: 6px; display: block; color: var(--text-main);">Email Address</label>
+                    <input type="email" id="authLoginEmail" class="form-control" placeholder="e.g. student@unilag.edu.ng" required autocomplete="username" style="padding: 10px 12px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0; color: var(--text-main);">Password</label>
+                        <span onclick="togglePasswordVisibility('authLoginPassword')" style="font-size: 0.74rem; color: var(--primary); cursor: pointer; font-weight: 600;">Show/Hide</span>
+                    </div>
+                    <input type="password" id="authLoginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password" style="padding: 10px 12px;">
+                </div>
+                <button type="submit" id="btnSubmitSignIn" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.92rem; border-radius: var(--radius-sm); margin-bottom: 12px; cursor: pointer;">
+                    Sign In to Account
+                </button>
+            </form>
+
+            <!-- SIGN UP FORM -->
+            <form id="authSignUpForm" onsubmit="handleAuthSignUp(event)" style="display: none;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; display: block; color: var(--text-main);">Full Name</label>
+                    <input type="text" id="authRegisterName" class="form-control" placeholder="e.g. Chinedu Okafor" required autocomplete="name" style="padding: 9px 12px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; display: block; color: var(--text-main);">Campus / Institution</label>
+                    <input type="text" id="authRegisterCampus" class="form-control" placeholder="e.g. UNILAG, FUTO, UI, UNIBEN, LASU" style="padding: 9px 12px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; display: block; color: var(--text-main);">Email Address</label>
+                    <input type="email" id="authRegisterEmail" class="form-control" placeholder="e.g. student@unilag.edu.ng" required autocomplete="email" style="padding: 9px 12px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0; color: var(--text-main);">Password</label>
+                        <span onclick="togglePasswordVisibility('authRegisterPassword')" style="font-size: 0.74rem; color: var(--primary); cursor: pointer; font-weight: 600;">Show/Hide</span>
+                    </div>
+                    <input type="password" id="authRegisterPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password" style="padding: 9px 12px;">
+                </div>
+                <button type="submit" id="btnSubmitSignUp" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.92rem; border-radius: var(--radius-sm); margin-bottom: 12px; cursor: pointer;">
+                    Create Free Account
+                </button>
+            </form>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin: 16px 0;">
+                <div style="flex: 1; height: 1px; background: var(--border);"></div>
+                <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700;">OR</span>
+                <div style="flex: 1; height: 1px; background: var(--border);"></div>
+            </div>
+
+            <!-- Guest Mode Button -->
+            <button type="button" class="btn btn-outline" onclick="continueAsGuest()" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 700; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>📱</span> <span>Continue as Guest (Offline Mode)</span>
+            </button>
+
+            <!-- Return to Guest Dashboard if opened from inside guest mode -->
+            <button id="btnReturnGuest" type="button" class="btn btn-sm" onclick="showMainApp()" style="display: none; width: 100%; margin-top: 10px; padding: 8px; font-size: 0.8rem; background: var(--surface-subtle); color: var(--text-muted); border: 1px solid var(--border);">
+                ← Return to Dashboard
+            </button>
+
+            <!-- Sub-footer with Security Note & Admin Portal -->
+            <div style="margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-muted);">
+                <span>🔒 Multi-Device Cloud Sync</span>
+                <span onclick="openAdminModal()" style="cursor: pointer; color: var(--text-muted); text-decoration: underline;">🔐 Admin Portal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER (DASHBOARD & ALL FEATURES) -->
+    <div id="appContainer" style="display: none;">
     <!-- Header Navigation -->
     <header>
         <div class="header-content">
@@ -1970,89 +2133,11 @@
     <!-- ==========================================
          MODALS
          ========================================== -->
+    </div><!-- /#appContainer -->
 
-    <!-- MODAL: CLOUD USER AUTHENTICATION (LOGIN & REGISTRATION) -->
-    <div class="modal-backdrop" id="authModal">
-        <div class="modal-card" style="max-width: 440px;">
-            <div style="display: flex; justify-content: flex-end; margin-bottom: -10px;">
-                <button class="btn-icon" onclick="closeModal('authModal')" style="border: none; font-size: 1.2rem;">&times;</button>
-            </div>
-            <div style="text-align: center; margin-bottom: 16px;">
-                <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--primary-light); color: var(--primary); font-size: 1.5rem; font-weight: 800; border-radius: 12px; margin-bottom: 8px;">
-                    &#8358;
-                </div>
-                <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; color: var(--text-main);">NairaFlow Student Account</h3>
-                <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
-                    Sign in or create your student account to manage your allowances, campus dues, and cafeteria meals.
-                </p>
-            </div>
-
-            <!-- Tab Switcher (Sign In vs Create Account) -->
-            <div style="display: flex; background: var(--surface-subtle); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px;">
-                <button type="button" id="tabAuthSignInBtn" class="btn btn-sm active" onclick="switchAuthTab('signin')" style="flex: 1; border-radius: 6px; font-weight: 700; padding: 7px;">
-                    🔑 Sign In
-                </button>
-                <button type="button" id="tabAuthSignUpBtn" class="btn btn-sm" onclick="switchAuthTab('signup')" style="flex: 1; border-radius: 6px; font-weight: 700; padding: 7px; background: transparent; border: none; color: var(--text-muted);">
-                    ✨ Create Account
-                </button>
-            </div>
-
-            <!-- Alert message for errors / success -->
-            <div id="authAlertBox" style="display: none; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-bottom: 14px; line-height: 1.4;"></div>
-
-            <!-- SIGN IN FORM -->
-            <form id="authSignInForm" onsubmit="handleAuthSignIn(event)">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block;">Email Address</label>
-                    <input type="email" id="authLoginEmail" class="form-control" placeholder="e.g. student@unilag.edu.ng" required autocomplete="username">
-                </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0;">Password</label>
-                        <span onclick="togglePasswordVisibility('authLoginPassword')" style="font-size: 0.72rem; color: var(--primary); cursor: pointer; font-weight: 600;">Show/Hide</span>
-                    </div>
-                    <input type="password" id="authLoginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
-                </div>
-                <button type="submit" id="btnSubmitSignIn" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700; margin-bottom: 12px;">
-                    Sign In to Account
-                </button>
-            </form>
-
-            <!-- SIGN UP FORM -->
-            <form id="authSignUpForm" onsubmit="handleAuthSignUp(event)" style="display: none;">
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block;">Full Name</label>
-                    <input type="text" id="authRegisterName" class="form-control" placeholder="e.g. Chinedu Okafor" required autocomplete="name">
-                </div>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block;">Campus / Institution</label>
-                    <input type="text" id="authRegisterCampus" class="form-control" placeholder="e.g. UNILAG, FUTO, UI, UNIBEN, LASU">
-                </div>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block;">Email Address</label>
-                    <input type="email" id="authRegisterEmail" class="form-control" placeholder="e.g. student@unilag.edu.ng" required autocomplete="email">
-                </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; display: block;">Password</label>
-                    <input type="password" id="authRegisterPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
-                </div>
-                <button type="submit" id="btnSubmitSignUp" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700; margin-bottom: 12px;">
-                    Create Free Account
-                </button>
-            </form>
-
-            <div style="display: flex; align-items: center; gap: 8px; margin: 12px 0;">
-                <div style="flex: 1; height: 1px; background: var(--border);"></div>
-                <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;">OR</span>
-                <div style="flex: 1; height: 1px; background: var(--border);"></div>
-            </div>
-
-            <!-- Guest Mode Button -->
-            <button type="button" class="btn btn-outline" onclick="continueAsGuest()" style="width: 100%; padding: 9px; font-size: 0.82rem; font-weight: 700;">
-                📱 Continue as Guest (Offline Mode)
-            </button>
-        </div>
-    </div>
+    <!-- ==========================================
+         MODALS
+         ========================================== -->
 
     <!-- MODAL: ADMIN ACCESS AUTHENTICATION -->
     <div class="modal-backdrop" id="adminAuthModal">
@@ -3023,9 +3108,54 @@
         }
 
         /* --------------------------------------------------------------------------
-           LOCALSTORAGE PERSISTENCE (STARTS 100% BLANK WITH 0.00 NAIRA ON LAUNCH)
+           ACCOUNT-ISOLATED DATA PERSISTENCE & MULTI-USER STORAGE
            -------------------------------------------------------------------------- */
+        function getUserStorageKey(user) {
+            if (!user) return "nairaflow_guest_data";
+            const id = user.id || (user.email ? user.email.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'guest');
+            return "nairaflow_user_data_" + id;
+        }
+
+        function restoreUserAccountData(user) {
+            if (!user) return;
+            const key = getUserStorageKey(user);
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appData = Object.assign(getCleanDefaultAppData(), parsed);
+                    if (parsed.student) {
+                        appData.student = Object.assign({}, getCleanDefaultAppData().student, parsed.student);
+                    }
+                } catch (e) {
+                    console.error("Error restoring user data from key:", e);
+                }
+            } else {
+                // Check if active session buffer has valid user data
+                const activeDb = localStorage.getItem("nairaflow_db_v2");
+                if (activeDb) {
+                    try {
+                        const parsed = JSON.parse(activeDb);
+                        appData = Object.assign(getCleanDefaultAppData(), parsed);
+                        if (parsed.student) {
+                            appData.student = Object.assign({}, getCleanDefaultAppData().student, parsed.student);
+                        }
+                    } catch (e) {}
+                } else {
+                    appData = getCleanDefaultAppData();
+                }
+                localStorage.setItem(key, JSON.stringify(appData));
+            }
+            localStorage.setItem("nairaflow_db_v2", JSON.stringify(appData));
+        }
+
         function saveLocalStateOnly() {
+            if (currentUser) {
+                const key = getUserStorageKey(currentUser);
+                localStorage.setItem(key, JSON.stringify(appData));
+            } else if (localStorage.getItem("nairaflow_guest_mode") === "true") {
+                localStorage.setItem("nairaflow_guest_data", JSON.stringify(appData));
+            }
             localStorage.setItem("nairaflow_db_v2", JSON.stringify(appData));
         }
 
@@ -3037,22 +3167,22 @@
         }
 
         function loadState() {
-            // Remove previous version data so first-time visits start completely blank
             localStorage.removeItem("nairaflow_db_v1");
-            const raw = localStorage.getItem("nairaflow_db_v2");
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    appData = Object.assign({}, appData, parsed);
-                    if (parsed.student) {
-                        appData.student = Object.assign({}, appData.student, parsed.student);
-                    }
-                } catch (e) {
-                    console.error("Failed to parse local storage, using memory defaults", e);
+            const savedUser = getCurrentUserSession();
+            if (savedUser) {
+                currentUser = savedUser;
+                restoreUserAccountData(savedUser);
+            } else if (localStorage.getItem("nairaflow_guest_mode") === "true") {
+                const guestData = localStorage.getItem("nairaflow_guest_data");
+                if (guestData) {
+                    try {
+                        appData = Object.assign(getCleanDefaultAppData(), JSON.parse(guestData));
+                    } catch(e) {}
+                } else {
+                    appData = getCleanDefaultAppData();
                 }
             } else {
-                // Completely fresh initial launch: NO sample data, keep 0.00
-                saveState();
+                appData = getCleanDefaultAppData();
             }
 
             // Ensure quick presets exist with defaults
@@ -5639,40 +5769,84 @@
             }
         }
 
+        function showStandaloneAuth(alertMsg = "") {
+            const authScreen = document.getElementById("standaloneAuthScreen");
+            const appContainer = document.getElementById("appContainer");
+            if (authScreen) authScreen.style.display = "flex";
+            if (appContainer) appContainer.style.display = "none";
+
+            const btnGuestReturn = document.getElementById("btnReturnGuest");
+            const isGuest = localStorage.getItem("nairaflow_guest_mode") === "true";
+            if (btnGuestReturn) {
+                btnGuestReturn.style.display = isGuest ? "block" : "none";
+            }
+
+            if (alertMsg) {
+                setAuthAlert(alertMsg, true);
+            } else {
+                setAuthAlert("", false);
+            }
+            switchAuthTab("signin");
+        }
+
+        function showMainApp() {
+            const authScreen = document.getElementById("standaloneAuthScreen");
+            const appContainer = document.getElementById("appContainer");
+            if (authScreen) authScreen.style.display = "none";
+            if (appContainer) appContainer.style.display = "flex";
+            window.scrollTo(0, 0);
+        }
+
+        function openAuthModal() {
+            showStandaloneAuth();
+        }
+
+        function closeAuthModal() {
+            showMainApp();
+        }
+
+        function initAuthDisplay() {
+            const savedUser = getCurrentUserSession();
+            const isGuest = localStorage.getItem("nairaflow_guest_mode") === "true";
+            if (savedUser || isGuest) {
+                showMainApp();
+            } else {
+                showStandaloneAuth();
+            }
+        }
+
         async function checkAuthSession() {
             initSupabaseClient();
 
-            // 1. Check if user already signed in locally
             const savedUser = getCurrentUserSession();
+            const isGuest = localStorage.getItem("nairaflow_guest_mode") === "true";
+
             if (savedUser) {
                 currentUser = savedUser;
+                restoreUserAccountData(savedUser);
                 renderHeaderAuthPill();
-            }
+                showMainApp();
 
-            // 2. If Supabase is connected, verify cloud session
-            if (supabaseClient) {
-                try {
-                    const { data: { session }, error } = await supabaseClient.auth.getSession();
-                    if (session && session.user) {
-                        currentUser = session.user;
-                        setCurrentUserSession(session.user);
-                        renderHeaderAuthPill();
-                        await loadUserDataFromCloud();
-                        return;
+                if (supabaseClient) {
+                    try {
+                        const { data: { session }, error } = await supabaseClient.auth.getSession();
+                        if (session && session.user) {
+                            currentUser = session.user;
+                            setCurrentUserSession(session.user);
+                            renderHeaderAuthPill();
+                            await loadUserDataFromCloud(false);
+                            return;
+                        }
+                    } catch (err) {
+                        console.warn("Supabase session check error:", err);
                     }
-                } catch (err) {
-                    console.warn("Supabase session check error:", err);
                 }
-            }
-
-            renderHeaderAuthPill();
-
-            // 3. If no user session and not guest, prompt login modal
-            if (!currentUser) {
-                const isGuest = localStorage.getItem("nairaflow_guest_mode");
-                if (!isGuest) {
-                    setTimeout(() => openAuthModal(), 400);
-                }
+            } else if (isGuest) {
+                renderHeaderAuthPill();
+                showMainApp();
+            } else {
+                renderHeaderAuthPill();
+                showStandaloneAuth();
             }
         }
 
@@ -5803,11 +5977,6 @@
             }
         }
 
-        function openAuthModal() {
-            setAuthAlert("", false);
-            openModal("authModal");
-        }
-
         function switchAuthTab(tab) {
             const signInTab = document.getElementById("tabAuthSignInBtn");
             const signUpTab = document.getElementById("tabAuthSignUpBtn");
@@ -5872,8 +6041,26 @@
 
         function continueAsGuest() {
             localStorage.setItem("nairaflow_guest_mode", "true");
-            closeModal("authModal");
-            showToast("Continuing in Offline / Guest Mode");
+            currentUser = null;
+            const guestData = localStorage.getItem("nairaflow_guest_data");
+            if (guestData) {
+                try {
+                    appData = Object.assign(getCleanDefaultAppData(), JSON.parse(guestData));
+                } catch(e) {}
+            } else {
+                appData = getCleanDefaultAppData();
+            }
+            renderDashboard();
+            renderStudentCampusHub();
+            renderTransactions();
+            renderMarketStaples();
+            renderBillsAndEstimators();
+            renderDebts();
+            renderTodos();
+            renderHeaderAuthPill();
+            updateSettingsAccountSection();
+            showMainApp();
+            showToast("Continuing in Guest / Offline Mode 📱");
         }
 
         async function handleAuthSignIn(e) {
@@ -5901,11 +6088,12 @@
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (!error && data && data.user) {
                         setCurrentUserSession(data.user);
+                        restoreUserAccountData(data.user);
                         renderHeaderAuthPill();
-                        closeModal("authModal");
+                        showMainApp();
                         const name = (data.user.user_metadata && data.user.user_metadata.full_name) || data.user.email;
                         showToast(`Welcome back, ${name}! (Cloud SQL Synced)`);
-                        await loadUserDataFromCloud();
+                        await loadUserDataFromCloud(false);
                         if (submitBtn) {
                             submitBtn.disabled = false;
                             submitBtn.textContent = "Sign In to Account";
@@ -5921,12 +6109,16 @@
                             }
                             return;
                         } else if (error.message.toLowerCase().includes("invalid login credentials")) {
-                            setAuthAlert("❌ Incorrect email or password. Please verify and try again.");
-                            if (submitBtn) {
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = "Sign In to Account";
+                            const accounts = getLocalAccounts();
+                            const localAcc = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
+                            if (!localAcc) {
+                                setAuthAlert("❌ Incorrect email or password. Please verify and try again.");
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.textContent = "Sign In to Account";
+                                }
+                                return;
                             }
-                            return;
                         } else {
                             setAuthAlert("⚠️ " + error.message);
                             if (submitBtn) {
@@ -5937,11 +6129,11 @@
                         }
                     }
                 } catch (err) {
-                    console.warn("Supabase sign in failed:", err);
+                    console.warn("Supabase sign in failed, checking local accounts:", err);
                 }
             }
 
-            // 2. Local accounts authentication (works instantly without requiring Supabase keys!)
+            // 2. Local accounts authentication (works offline or without Supabase keys)
             const accounts = getLocalAccounts();
             const found = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
 
@@ -5956,9 +6148,17 @@
                         }
                     };
                     setCurrentUserSession(userSession);
+                    restoreUserAccountData(userSession);
                     renderHeaderAuthPill();
-                    closeModal("authModal");
+                    showMainApp();
                     showToast(`Welcome back, ${found.fullName}!`);
+                    renderDashboard();
+                    renderStudentCampusHub();
+                    renderTransactions();
+                    renderMarketStaples();
+                    renderBillsAndEstimators();
+                    renderDebts();
+                    renderTodos();
                 } else {
                     setAuthAlert("Incorrect password. Please verify and try again.");
                 }
@@ -6028,8 +6228,10 @@
 
                     if (data.session && data.user) {
                         setCurrentUserSession(data.user);
+                        appData = getCleanDefaultAppData();
+                        saveLocalStateOnly();
                         renderHeaderAuthPill();
-                        closeModal("authModal");
+                        showMainApp();
                         showToast(`Welcome to NairaFlow, ${name}! Your Cloud SQL account is active.`);
                         await syncStateToCloud(true);
                         return;
@@ -6078,9 +6280,18 @@
                 }
             };
             setCurrentUserSession(userSession);
+            appData = getCleanDefaultAppData();
+            saveLocalStateOnly();
             renderHeaderAuthPill();
-            closeModal("authModal");
+            showMainApp();
             showToast(`Welcome, ${name}! Your NairaFlow account is ready. 🎉`);
+            renderDashboard();
+            renderStudentCampusHub();
+            renderTransactions();
+            renderMarketStaples();
+            renderBillsAndEstimators();
+            renderDebts();
+            renderTodos();
 
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -6091,7 +6302,20 @@
         async function handleAuthSignOut() {
             if (!confirm("Are you sure you want to log out of your NairaFlow account?")) return;
 
-            // 1. Sign out of Supabase if active
+            // 1. Safely save current user state before ending session
+            if (currentUser) {
+                try {
+                    const key = getUserStorageKey(currentUser);
+                    localStorage.setItem(key, JSON.stringify(appData));
+                    if (supabaseClient) {
+                        await syncStateToCloud();
+                    }
+                } catch (e) {
+                    console.warn("Pre-logout save error:", e);
+                }
+            }
+
+            // 2. Sign out of Supabase if active
             if (supabaseClient) {
                 try {
                     await supabaseClient.auth.signOut();
@@ -6100,18 +6324,18 @@
                 }
             }
 
-            // 2. Wipe current user session & all local cached data of this account
+            // 3. Wipe current user active session tokens
+            currentUser = null;
             setCurrentUserSession(null);
             localStorage.removeItem("nairaflow_current_user");
             localStorage.removeItem("nairaflow_guest_mode");
             localStorage.removeItem("nairaflow_db_v2");
             localStorage.removeItem("nairaflow_db_v1");
 
-            // 3. Reset app memory to a 100% clean, blank state
+            // 4. Reset in-memory appData to 100% clean, blank state
             appData = getCleanDefaultAppData();
-            saveLocalStateOnly();
 
-            // 4. Update Header & All Tabs to clean blank state
+            // 5. Update Header & All Tabs to clean blank state so no data is visible
             renderHeaderAuthPill();
             updateSettingsAccountSection();
             switchTab('dashboard');
@@ -6123,25 +6347,24 @@
             renderDebts();
             renderTodos();
 
-            // 5. Clear login & registration form inputs
+            // 6. Clear login & registration form inputs
             const emailInp = document.getElementById("authLoginEmail");
             const passInp = document.getElementById("authLoginPassword");
             const regName = document.getElementById("authRegisterName");
+            const regCampus = document.getElementById("authRegisterCampus");
             const regEmail = document.getElementById("authRegisterEmail");
             const regPass = document.getElementById("authRegisterPassword");
             if (emailInp) emailInp.value = "";
             if (passInp) passInp.value = "";
             if (regName) regName.value = "";
+            if (regCampus) regCampus.value = "";
             if (regEmail) regEmail.value = "";
             if (regPass) regPass.value = "";
 
             showToast("Logged out successfully. All session data cleared! 👋");
 
-            // 6. Immediately take the user to the Login page
-            switchAuthTab("signin");
-            setTimeout(() => {
-                openAuthModal();
-            }, 150);
+            // 7. LEAVE THE DASHBOARD ENTIRELY AND DISPLAY THE STANDALONE LOGIN SCREEN
+            showStandaloneAuth("You have logged out successfully. Sign in to access your student budget & transactions.");
         }
 
         /* --------------------------------------------------------------------------
@@ -6280,6 +6503,22 @@
         async function loadUserDataFromCloud(showToastFeedback = true) {
             if (!supabaseClient || !currentUser) return;
             try {
+                // 0. Profile & Allowance Settings
+                try {
+                    const { data: profileData } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+                    if (profileData) {
+                        if (!appData.student) appData.student = {};
+                        if (profileData.allowance_amount !== undefined && profileData.allowance_amount !== null) {
+                            appData.student.allowanceAmount = parseFloat(profileData.allowance_amount) || 0;
+                        }
+                        if (profileData.expected_allowance_day) {
+                            appData.student.expectedAllowanceDay = parseInt(profileData.expected_allowance_day) || 28;
+                        }
+                    }
+                } catch (profErr) {
+                    console.warn("Profile load error:", profErr);
+                }
+
                 // 1. Wallets
                 const { data: walletsData, error: wErr } = await supabaseClient.from('wallets').select('*');
                 if (wErr) console.error("Load wallets error:", wErr);
@@ -6417,6 +6656,24 @@
             isCloudSyncing = true;
 
             try {
+                // 0. Upsert User Profile & Allowance Settings
+                if (appData.student) {
+                    try {
+                        await supabaseClient.from('profiles').upsert({
+                            id: currentUser.id,
+                            email: currentUser.email,
+                            full_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || '',
+                            institution: (currentUser.user_metadata && currentUser.user_metadata.campus) || '',
+                            student_mode: !!appData.student.enabled,
+                            allowance_amount: parseFloat(appData.student.allowanceAmount) || 0,
+                            expected_allowance_day: parseInt(appData.student.expectedAllowanceDay) || 28,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'id' });
+                    } catch (profSyncErr) {
+                        console.warn("Profile sync error:", profSyncErr);
+                    }
+                }
+
                 // 1. Upsert Wallets
                 if (appData.wallets && appData.wallets.length > 0) {
                     const walletRows = appData.wallets.map(w => {
@@ -6573,13 +6830,19 @@
             const next = current === "dark" ? "light" : "dark";
             document.documentElement.setAttribute("data-theme", next);
             localStorage.setItem("nairaflow_theme", next);
-            document.getElementById("themeIcon").innerHTML = next === "dark" ? "&#9788;" : "&#9790;";
+            const iconHtml = next === "dark" ? "&#9788;" : "&#9790;";
+            const themeIcon = document.getElementById("themeIcon");
+            if (themeIcon) themeIcon.innerHTML = iconHtml;
+            document.querySelectorAll(".themeIconAuth").forEach(el => el.innerHTML = iconHtml);
         }
 
         function initTheme() {
             const saved = localStorage.getItem("nairaflow_theme") || "light";
             document.documentElement.setAttribute("data-theme", saved);
-            document.getElementById("themeIcon").innerHTML = saved === "dark" ? "&#9788;" : "&#9790;";
+            const iconHtml = saved === "dark" ? "&#9788;" : "&#9790;";
+            const themeIcon = document.getElementById("themeIcon");
+            if (themeIcon) themeIcon.innerHTML = iconHtml;
+            document.querySelectorAll(".themeIconAuth").forEach(el => el.innerHTML = iconHtml);
         }
 
         function showToast(msg) {
@@ -6693,6 +6956,7 @@
         window.addEventListener("DOMContentLoaded", () => {
             initTheme();
             loadState();
+            initAuthDisplay();
             renderDashboard();
             checkAuthSession();
             if ('serviceWorker' in navigator) {

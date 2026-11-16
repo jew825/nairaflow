@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nairaflow-v5';
+const CACHE_NAME = 'nairaflow-v6';
 const ASSETS_TO_CACHE = [
   './manifest.json'
 ];
