@@ -4210,34 +4210,51 @@
             }
         }
 
-        function toggleHandoutPaid(id, isChecked) {
+        let currentHandoutsFilter = 'all';
+
+        function setHandoutsFilter(filter) {
+            currentHandoutsFilter = filter;
+            renderStudentCampusHub();
+        }
+
+        function toggleHandoutPaid(id) {
             if (!appData.student || !appData.student.handouts) return;
-            const h = appData.student.handouts.find(item => item.id === id);
-            if (!h) return;
+            const h = appData.student.handouts.find(item => String(item.id) === String(id));
+            if (!h) {
+                console.warn("Handout due not found for ID:", id);
+                return;
+            }
 
-            h.paid = isChecked;
+            const willBePaid = !h.paid;
+            h.paid = willBePaid;
 
-            if (isChecked) {
-                const shouldLog = confirm(`Marked "${h.title}" as paid!\n\nDo you want to automatically log an expense of ${formatNaira(h.cost)} under "Handouts, Manuals & Course Packs"?`);
+            if (willBePaid) {
+                const defaultWallet = appData.wallets[0] || { id: "w-main", name: "Primary Commercial Bank" };
+                const shouldLog = confirm(`Marked "${h.title}" (${formatNaira(h.cost)}) as PAID! ✅\n\nDo you want to deduct this ${formatNaira(h.cost)} from your "${defaultWallet.name}" and log it as an expense?`);
                 if (shouldLog) {
-                    const targetWallet = appData.wallets[0] || { id: "w-main" };
-                    targetWallet.balance -= h.cost;
+                    const currentBal = parseFloat(defaultWallet.balance) || 0;
+                    defaultWallet.balance = Math.round((currentBal - h.cost) * 100) / 100;
                     appData.transactions.unshift({
-                        id: "tx-" + Date.now(),
+                        id: generateUUID(),
                         type: "expense",
                         title: `Handout / Due: ${h.title}`,
                         amount: h.cost,
                         category: "Handouts, Manuals & Course Packs",
-                        walletId: targetWallet.id,
+                        walletId: defaultWallet.id,
                         date: new Date().toISOString().split('T')[0]
                     });
-                    showToast(`Logged ${formatNaira(h.cost)} for "${h.title}"`);
+                    showToast(`Marked "${h.title}" Paid & deducted ${formatNaira(h.cost)} from ${defaultWallet.name} ✅`);
+                } else {
+                    showToast(`Marked "${h.title}" as Paid! ✅`);
                 }
+            } else {
+                showToast(`Marked "${h.title}" as Unpaid ⏳`);
             }
 
             saveState();
             renderStudentCampusHub();
             renderDashboard();
+            renderWallets();
         }
 
         function openHandoutModal() {
@@ -4264,7 +4281,7 @@
             }
 
             appData.student.handouts.push({
-                id: "h-" + Date.now(),
+                id: generateUUID(),
                 title,
                 cost,
                 rep,
@@ -5238,6 +5255,10 @@
         function openTransactionModal(type) {
             document.getElementById("txType").value = type;
             document.getElementById("txModalTitle").textContent = (type === 'income') ? "Log Inflow / Income" : "Log Expense / Outflow";
+            const saveBtn = document.getElementById("txSaveBtn");
+            if (saveBtn) {
+                saveBtn.textContent = (type === 'income') ? "Deposit Income" : "Record Expense";
+            }
             document.getElementById("txDate").value = new Date().toISOString().split('T')[0];
 
             // Populate Category Select dynamically based on mode
@@ -5245,7 +5266,7 @@
             const cats = (type === 'income') ? getActiveIncomeCategories() : getActiveExpenseCategories();
             catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
 
-            // Populate Wallets
+            // Populate Wallets with current live balances
             const walletSelect = document.getElementById("txWallet");
             walletSelect.innerHTML = appData.wallets.map(w => `<option value="${w.id}">${w.name} (${formatNaira(w.balance)})</option>`).join('');
 
@@ -5273,24 +5294,33 @@
             const category = document.getElementById("txCategory").value;
             const title = document.getElementById("txTitle").value.trim();
             const walletId = document.getElementById("txWallet").value;
-            const date = document.getElementById("txDate").value;
+            const date = document.getElementById("txDate").value || new Date().toISOString().split('T')[0];
 
-            const wallet = appData.wallets.find(w => w.id === walletId);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            let wallet = appData.wallets.find(w => String(w.id) === String(walletId));
+            if (!wallet && appData.wallets.length > 0) {
+                wallet = appData.wallets[0];
+            }
             if (!wallet) return;
 
+            const parsedBal = parseFloat(wallet.balance) || 0;
             if (type === "expense") {
-                wallet.balance -= amount;
+                wallet.balance = Math.round((parsedBal - amount) * 100) / 100;
             } else {
-                wallet.balance += amount;
+                wallet.balance = Math.round((parsedBal + amount) * 100) / 100;
             }
 
             const newTx = {
-                id: "tx-" + Date.now(),
+                id: generateUUID(),
                 type,
                 title,
                 amount,
                 category,
-                walletId,
+                walletId: wallet.id,
                 date
             };
 
@@ -5308,7 +5338,8 @@
             document.getElementById("txForm").reset();
             renderDashboard();
             renderTransactions();
-            showToast(`Logged ${type === 'income' ? 'inflow' : 'outflow'} of ${formatNaira(amount)}`);
+            renderWallets();
+            showToast(`Logged ${type === 'income' ? 'inflow' : 'outflow'} of ${formatNaira(amount)} to ${wallet.name} ✅`);
         }
 
         function logStaplePriceInternal(name, price, vendor, date) {
@@ -5569,7 +5600,7 @@
             if (!name) return;
 
             appData.wallets.push({
-                id: "w-" + Date.now(),
+                id: generateUUID(),
                 name: name,
                 balance: bal,
                 tag: tag
@@ -6501,7 +6532,7 @@
            TWO-WAY CLOUD SQL DATABASE DATA SYNC & AUTOMATIC REFRESH
            -------------------------------------------------------------------------- */
         async function loadUserDataFromCloud(showToastFeedback = true) {
-            if (!supabaseClient || !currentUser) return;
+            if (!supabaseClient || !currentUser || !isValidUUID(currentUser.id)) return;
             try {
                 // 0. Profile & Allowance Settings
                 try {
@@ -6651,7 +6682,7 @@
         }, 20000);
 
         async function syncStateToCloud(forceAll = false) {
-            if (!supabaseClient || !currentUser) return;
+            if (!supabaseClient || !currentUser || !isValidUUID(currentUser.id)) return;
             if (isCloudSyncing) return;
             isCloudSyncing = true;
 
@@ -6875,9 +6906,9 @@
             const activeMobileBtn = document.getElementById("mNav-" + tabId);
             if (activeMobileBtn) activeMobileBtn.classList.add("active");
 
-            if (tabId === "dashboard") renderDashboard();
+            if (tabId === "dashboard") { renderWallets(); renderDashboard(); }
             if (tabId === "campus") renderStudentCampusHub();
-            if (tabId === "transactions") renderTransactions();
+            if (tabId === "transactions") { renderWallets(); renderTransactions(); }
             if (tabId === "market") renderMarketStaples();
             if (tabId === "bills") renderBillsAndEstimators();
             if (tabId === "debts") renderDebts();
