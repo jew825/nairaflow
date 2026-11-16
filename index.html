@@ -170,7 +170,8 @@
             animation: fadeIn 0.15s ease-out;
         }
 
-        .dropdown-menu.show {
+        .dropdown-menu.show,
+        .dropdown-menu.open {
             display: block;
         }
 
@@ -1155,6 +1156,9 @@
             .calorie-input-grid > div:last-child {
                 grid-column: span 2;
             }
+            .hide-on-mobile {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -1219,6 +1223,13 @@
                         </div>
                         <div class="dropdown-item" onclick="switchTab('todos'); closeMenuDropdown();">
                             <span>✅ Costed Errands & Tasks</span>
+                        </div>
+                        <div class="dropdown-divider" id="menuAuthDivider"></div>
+                        <div class="dropdown-item" id="menuLoginItem" onclick="openAuthModal(); closeMenuDropdown();" style="color: var(--primary); font-weight: 700;">
+                            <span>🔑 Sign In / Create Account</span>
+                        </div>
+                        <div class="dropdown-item" id="menuLogoutItem" onclick="handleAuthSignOut(); closeMenuDropdown();" style="color: var(--danger); font-weight: 700; display: none;">
+                            <span>🚪 Log Out / Sign Out</span>
                         </div>
 
                     </div>
@@ -1596,6 +1607,16 @@
                  TAB 7: SETTINGS & BACKUP
                  ========================================== -->
             <section id="tab-settings" class="tab-section">
+                <!-- USER ACCOUNT & SESSION CARD -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <h3 class="card-title">&#128100; Account & Login Session</h3>
+                    </div>
+                    <div id="settingsAccountCardBody">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">&#9881; Data Persistence, Backup & Reset</h3>
@@ -5592,38 +5613,43 @@
                 const isCloud = !!supabaseClient;
 
                 container.innerHTML = `
-                    <div class="dropdown-wrap" id="userMenuWrap" style="position: relative;">
-                        <button class="btn-icon" onclick="toggleUserDropdown(event)" style="width: auto; padding: 0 10px; gap: 5px; font-weight: 700; font-size: 0.78rem; background: var(--surface-subtle); border-color: var(--primary);">
-                            <span>👤</span> <span id="headerUserDisplayName">${name}</span> <span style="font-size: 0.6rem;">▼</span>
-                        </button>
-                        <div class="dropdown-menu" id="userDropdownMenu" style="right: 0; min-width: 220px; text-align: left;">
-                            <div style="padding: 10px 14px; border-bottom: 1px solid var(--border);">
-                                <div style="font-size: 0.72rem; color: var(--text-muted);">Signed in as</div>
-                                <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-main); word-break: break-all;">${currentUser.email}</div>
-                                <div style="margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; background: var(--primary-light); color: var(--primary); padding: 2px 6px; border-radius: 10px; font-weight: 700;">
-                                    <span>🟢</span> ${isCloud ? 'Cloud SQL Active' : 'Account Active (Local)'}
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div class="dropdown-wrap" id="userMenuWrap" style="position: relative;">
+                            <button class="btn-icon" onclick="toggleUserDropdown(event)" style="width: auto; padding: 0 10px; gap: 5px; font-weight: 700; font-size: 0.78rem; background: var(--surface-subtle); border-color: var(--primary);" title="Account & Sync">
+                                <span>👤</span> <span id="headerUserDisplayName">${name}</span> <span style="font-size: 0.6rem;">▼</span>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdownMenu" style="right: 0; min-width: 230px; text-align: left;">
+                                <div style="padding: 10px 14px; border-bottom: 1px solid var(--border);">
+                                    <div style="font-size: 0.72rem; color: var(--text-muted);">Signed in as</div>
+                                    <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-main); word-break: break-all;">${currentUser.email}</div>
+                                    <div style="margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; background: var(--primary-light); color: var(--primary); padding: 2px 6px; border-radius: 10px; font-weight: 700;">
+                                        <span>🟢</span> ${isCloud ? 'Cloud SQL Active' : 'Account Active (Local)'}
+                                    </div>
                                 </div>
-                            </div>
-                            ${isCloud ? `
-                                <div class="dropdown-item" onclick="loadUserDataFromCloud(); closeUserDropdown();">
-                                    <span>🔄 Refresh from Cloud SQL</span>
+                                ${isCloud ? `
+                                    <div class="dropdown-item" onclick="loadUserDataFromCloud(); closeUserDropdown();">
+                                        <span>🔄 Refresh from Cloud SQL</span>
+                                    </div>
+                                    <div class="dropdown-item" onclick="syncStateToCloud(true); closeUserDropdown();">
+                                        <span>☁️ Backup to Cloud SQL</span>
+                                    </div>
+                                ` : `
+                                    <div class="dropdown-item" onclick="openDbConfigModal(); closeUserDropdown();" style="color: var(--primary); font-weight: 700;">
+                                        <span>☁️ Connect Cloud SQL Database</span>
+                                    </div>
+                                `}
+                                <div class="dropdown-item" onclick="openDbConfigModal(); closeUserDropdown();">
+                                    <span>⚙️ Database Settings</span>
                                 </div>
-                                <div class="dropdown-item" onclick="syncStateToCloud(true); closeUserDropdown();">
-                                    <span>☁️ Backup to Cloud SQL</span>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="handleAuthSignOut(); closeUserDropdown();" style="color: var(--danger); font-weight: 700;">
+                                    <span>🚪 Log Out (${name})</span>
                                 </div>
-                            ` : `
-                                <div class="dropdown-item" onclick="openDbConfigModal(); closeUserDropdown();" style="color: var(--primary); font-weight: 700;">
-                                    <span>☁️ Connect Cloud SQL Database</span>
-                                </div>
-                            `}
-                            <div class="dropdown-item" onclick="openDbConfigModal(); closeUserDropdown();">
-                                <span>⚙️ Database Settings</span>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <div class="dropdown-item" onclick="handleAuthSignOut(); closeUserDropdown();" style="color: var(--danger);">
-                                <span>🚪 Sign Out</span>
                             </div>
                         </div>
+                        <button class="btn btn-outline btn-sm" onclick="handleAuthSignOut()" title="Log Out of NairaFlow" style="padding: 4px 8px; font-size: 0.75rem; color: var(--danger); border-color: var(--danger); font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">
+                            <span>🚪</span> <span class="hide-on-mobile">Log Out</span>
+                        </button>
                     </div>
                 `;
             } else {
@@ -5633,17 +5659,83 @@
                     </button>
                 `;
             }
+
+            updateSettingsAccountSection();
         }
 
         function toggleUserDropdown(e) {
             if (e) e.stopPropagation();
             const menu = document.getElementById("userDropdownMenu");
-            if (menu) menu.classList.toggle("open");
+            if (menu) {
+                menu.classList.toggle("show");
+                menu.classList.toggle("open");
+            }
         }
 
         function closeUserDropdown() {
             const menu = document.getElementById("userDropdownMenu");
-            if (menu) menu.classList.remove("open");
+            if (menu) {
+                menu.classList.remove("show");
+                menu.classList.remove("open");
+            }
+        }
+
+        function updateSettingsAccountSection() {
+            const el = document.getElementById("settingsAccountCardBody");
+            const menuLogin = document.getElementById("menuLoginItem");
+            const menuLogout = document.getElementById("menuLogoutItem");
+            const isCloud = !!supabaseClient;
+
+            if (currentUser) {
+                const name = (currentUser.user_metadata && currentUser.user_metadata.full_name) 
+                    || (currentUser.email ? currentUser.email.split('@')[0] : 'User');
+                const campus = (currentUser.user_metadata && currentUser.user_metadata.campus) || 'Campus Edition';
+
+                if (menuLogin) menuLogin.style.display = "none";
+                if (menuLogout) {
+                    menuLogout.style.display = "flex";
+                    menuLogout.innerHTML = `<span>🚪 Log Out (${name})</span>`;
+                }
+
+                if (el) {
+                    el.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                            <div>
+                                <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">${name}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">${currentUser.email || 'Registered User'} &bull; 🏫 ${campus}</div>
+                                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; background: var(--primary-light); color: var(--primary); padding: 3px 8px; border-radius: 12px; font-weight: 700;">
+                                    <span>🟢</span> ${isCloud ? 'Cloud SQL Active (Multi-Device Sync)' : 'Local Account Active'}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="btn btn-outline btn-sm" onclick="openDbConfigModal()">
+                                    <span>⚙️ Cloud Config</span>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="handleAuthSignOut()">
+                                    <span>🚪 Log Out</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                if (menuLogin) menuLogin.style.display = "flex";
+                if (menuLogout) menuLogout.style.display = "none";
+
+                if (el) {
+                    el.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Guest / Offline Mode</div>
+                                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Sign in or create an account to save and sync your campus budget safely.</div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="openAuthModal()">
+                                <span>🔑 Sign In / Register</span>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
         }
 
         function openAuthModal() {
@@ -5910,14 +6002,17 @@
         }
 
         async function handleAuthSignOut() {
+            if (!confirm("Are you sure you want to log out of your NairaFlow account?")) return;
             if (supabaseClient) {
                 try {
                     await supabaseClient.auth.signOut();
                 } catch (e) {}
             }
             setCurrentUserSession(null);
+            localStorage.removeItem("nairaflow_guest_mode");
             renderHeaderAuthPill();
-            showToast("Signed out of your account.");
+            updateSettingsAccountSection();
+            showToast("Logged out successfully! 👋");
             loadState();
             renderDashboard();
             renderStudentCampusHub();
@@ -6279,6 +6374,7 @@
             if (tabId === "bills") renderBillsAndEstimators();
             if (tabId === "debts") renderDebts();
             if (tabId === "todos") renderTodos();
+            if (tabId === "settings") updateSettingsAccountSection();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
