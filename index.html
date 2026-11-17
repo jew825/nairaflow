@@ -1928,20 +1928,18 @@
                 </div>
             </div>
             <div class="header-actions">
-                <!-- User Account / Cloud Auth Status Pill -->
-                <div id="headerAuthPill">
-                    <button class="btn btn-primary btn-sm" onclick="openAuthModal()" style="padding: 4px 10px; font-weight: 700; font-size: 0.78rem; border-radius: 8px;">
-                        <span>🔑 Sign In</span>
-                    </button>
-                </div>
+                <!-- Direct Settings & Cloud Sync Button -->
+                <button class="btn-icon" id="headerSettingsBtn" onclick="switchTab('settings')" title="Settings, Account & Live Sync" style="width: auto; padding: 0 10px; gap: 5px; font-weight: 700; font-size: 0.8rem;">
+                    <span>⚙️</span> <span class="hide-on-mobile">Settings</span>
+                </button>
 
-                <!-- Student Mode Toggle Button -->
-                <button class="btn-icon active" id="studentModeBtn" onclick="toggleStudentMode()" title="Toggle Campus Student Survival Mode" style="width: auto; padding: 0 10px; gap: 4px; font-weight: 700; font-size: 0.8rem; background: var(--primary-light); color: var(--primary); border-color: var(--primary);">
+                <!-- Student Mode Toggle Button (Desktop/Tablet) -->
+                <button class="btn-icon active hide-on-mobile" id="studentModeBtn" onclick="toggleStudentMode()" title="Toggle Campus Student Survival Mode" style="width: auto; padding: 0 10px; gap: 4px; font-weight: 700; font-size: 0.8rem; background: var(--primary-light); color: var(--primary); border-color: var(--primary);">
                     <span>🎓</span> <span id="studentModeLabel">Student Mode</span>
                 </button>
 
                 <!-- Dropdown Menu for Android & Desktop Navigation / Backup -->
-                <div class="dropdown-wrap" id="headerDropdownWrap">
+                <div class="dropdown-wrap hide-on-mobile" id="headerDropdownWrap">
                     <button class="btn-icon" id="menuDropdownBtn" onclick="toggleMenuDropdown(event)" title="Menu & Backup" style="width: auto; padding: 0 10px; gap: 4px; font-weight: 700; font-size: 0.8rem;">
                         <span>☰ Menu</span> <span style="font-size: 0.65rem;">▼</span>
                     </button>
@@ -1982,18 +1980,17 @@
                         <div class="dropdown-item" onclick="openAdminModal(); closeMenuDropdown();" style="color: var(--text-muted); font-size: 0.82rem;">
                             <span>🔐 Admin Portal</span>
                         </div>
-
                     </div>
                 </div>
 
-                <button class="btn-icon" id="ogaModeBtn" onclick="toggleOgaMode()" title="Oga Mode (Hide Balances in Public/Bus)">
+                <button class="btn-icon hide-on-mobile" id="ogaModeBtn" onclick="toggleOgaMode()" title="Oga Mode (Hide Balances in Public/Bus)">
                     <span id="ogaIcon">&#128065;</span>
                 </button>
                 <button class="btn-icon" id="themeBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
                     <span id="themeIcon">&#9790;</span>
                 </button>
-                <button class="btn btn-primary btn-sm" onclick="openTransactionModal('expense')">
-                    <span>+ Log Spend</span>
+                <button class="btn btn-primary btn-sm" onclick="openTransactionModal('expense')" style="white-space: nowrap; padding: 6px 12px; font-weight: 700;">
+                    <span>+ Spend</span>
                 </button>
             </div>
         </div>
@@ -2252,15 +2249,21 @@
                         <button class="btn btn-outline btn-sm" onclick="renderCharts()">🔄 Refresh Charts</button>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                        <div>
-                            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">7-Day Spending Burn</h4>
-                            <div class="chart-container">
+                        <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin: 0;">🔥 7-Day Spending Burn</h4>
+                                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Daily Outflows</span>
+                            </div>
+                            <div class="chart-container" style="height: 220px;">
                                 <canvas id="burnChart"></canvas>
                             </div>
                         </div>
-                        <div>
-                            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Category Breakdown</h4>
-                            <div class="chart-container">
+                        <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin: 0;">🍩 Category Breakdown</h4>
+                                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Top Expense Channels</span>
+                            </div>
+                            <div class="chart-container" style="height: 220px;">
                                 <canvas id="categoryDonutChart"></canvas>
                             </div>
                         </div>
@@ -2442,13 +2445,31 @@
                  TAB 7: SETTINGS & BACKUP
                  ========================================== -->
             <section id="tab-settings" class="tab-section">
-                <!-- USER ACCOUNT & SESSION CARD -->
+                <!-- USER ACCOUNT & LIVE CLOUD SYNC CARD -->
                 <div class="card" style="margin-bottom: 20px;">
                     <div class="card-header">
-                        <h3 class="card-title">&#128100; Account & Login Session</h3>
+                        <h3 class="card-title">&#128100; Account &amp; Live Cloud Sync</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0;">Manage your login session and real-time cross-device synchronization between laptop and phone.</p>
                     </div>
                     <div id="settingsAccountCardBody">
-                        <!-- Populated dynamically -->
+                        <div id="headerAuthPill">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);" id="headerUserDisplayName">Guest / Offline Student</div>
+                                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                                        Sign in with your account to synchronize your spendable balance and course dues between your laptop and phone in real time.
+                                    </div>
+                                    <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                        <div id="headerSyncStatus" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); background: var(--border); padding: 3px 8px; border-radius: 12px;">
+                                            <span>📱</span> Local Offline Mode
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="openAuthModal()" style="padding: 8px 16px; font-weight: 700; font-size: 0.85rem; border-radius: 8px;">
+                                    <span>🔑 Sign In / Create Account</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2456,18 +2477,6 @@
                     <div class="card-header">
                         <h3 class="card-title">&#9881; Data Persistence, Backup & Reset</h3>
                     </div>
-
-                    <div style="margin-bottom: 24px;">
-                        <h4 style="font-size: 1rem; margin-bottom: 6px;">Test with Sample Data</h4>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                            Populate the app with realistic Nigerian accounts, market prices, NEPA metrics, and IOU records.
-                        </p>
-                        <button class="btn btn-success" onclick="loadSampleNigerianData()">
-                            <span>🇳🇬 Load Realistic Nigerian Sample Data</span>
-                        </button>
-                    </div>
-
-                    <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
 
                     <div style="margin-bottom: 24px;">
                         <h4 style="font-size: 1rem; margin-bottom: 6px;">Export & Import Backups</h4>
@@ -2584,184 +2593,41 @@
                     </div>
                 </div>
 
-                <!-- 3. Campus Food Survival Math (Lodge Cooking vs Buka) -->
+                <!-- 3. Daily Meal Spend Calculator -->
                 <div class="card">
                     <div class="card-header">
                         <div>
-                            <h3 class="card-title">🍲 Campus Feeding Math: Lodge Cooking vs. Buka / Cafeteria</h3>
+                            <h3 class="card-title">🍽️ Daily Meal Spend Calculator</h3>
                             <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
-                                Analyze your meal spending, calculate daily breakfast/lunch/dinner, and track your daily nutrition intake.
+                                Track how much you spent on breakfast, lunch, and dinner today, and log it to your daily food expense.
                             </p>
                         </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 20px;">
-                        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; background: var(--surface);">
-                            <h4 style="color: var(--danger); font-size: 0.95rem; margin-bottom: 6px;">❌ Eating at School Cafeteria / Buka Daily</h4>
-                            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
-                                Breakfast (₦600) + Lunch (₦1,200) + Dinner (₦1,000) = ~₦2,800/day.
-                            </p>
-                            <div style="font-size: 1.25rem; font-weight: 800; color: var(--danger);">
-                                &#8358;84,000 / month
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Drains your allowance in less than 2 weeks.</div>
-                        </div>
-
-                        <div style="border: 2px solid var(--success); border-radius: var(--radius-sm); padding: 16px; background: var(--success-light);">
-                            <h4 style="color: var(--success); font-size: 0.95rem; margin-bottom: 6px;">✅ Cooking in the Lodge / Hostel</h4>
-                            <p style="font-size: 0.82rem; color: var(--text-main); margin-bottom: 10px;">
-                                1 Paint Garri (₦3,500) + Rice/Spag/Egg pot (₦4,000) = ~₦1,100/day.
-                            </p>
-                            <div style="font-size: 1.25rem; font-weight: 800; color: var(--success);">
-                                &#8358;33,000 / month
-                            </div>
-                            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-top: 4px;">🎉 You save over &#8358;51,000 every single month!</div>
-                        </div>
+                        <span class="badge" style="background: var(--primary-light); color: var(--primary); font-weight: 700; padding: 4px 10px; border-radius: 999px; font-size: 0.78rem;">Live Calculator</span>
                     </div>
 
-                    <!-- Daily Meal Spend Calculator -->
-                    <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                            <div>
-                                <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-main);">🍽️ Daily Meals Spend Calculator</h4>
-                                <div style="font-size: 0.78rem; color: var(--text-muted);">How much did you spend on food today? Track your breakfast, lunch, and dinner.</div>
-                            </div>
-                            <span class="badge" style="background: var(--primary-light); color: var(--primary); font-weight: 700; padding: 4px 10px; border-radius: 999px; font-size: 0.78rem;">Live Calculator</span>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 14px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.8rem; font-weight: 700;">🌅 Breakfast Today (₦)</label>
+                            <input type="number" id="mealBreakfast" class="form-control" placeholder="0.00" min="0" oninput="calculateDailyMealSpend()">
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 14px;">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 0.8rem; font-weight: 700;">🌅 Breakfast Today (&#8358;)</label>
-                                <input type="number" id="mealBreakfast" class="form-control" placeholder="0.00" min="0" oninput="calculateDailyMealSpend()">
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 0.8rem; font-weight: 700;">☀️ Lunch Today (&#8358;)</label>
-                                <input type="number" id="mealLunch" class="form-control" placeholder="0.00" min="0" oninput="calculateDailyMealSpend()">
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 0.8rem; font-weight: 700;">🌙 Dinner Today (&#8358;)</label>
-                                <input type="number" id="mealDinner" class="form-control" placeholder="0.00" min="0" oninput="calculateDailyMealSpend()">
-                            </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.8rem; font-weight: 700;">☀️ Lunch Today (₦)</label>
+                            <input type="number" id="mealLunch" class="form-control" placeholder="0.00" min="0" oninput="calculateDailyMealSpend()">
                         </div>
-                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                            <div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Food Spent Today</div>
-                                <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);" id="totalDailyMealSpendText">&#8358;0.00</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);" id="monthlyMealProjectionText">Monthly food projection: &#8358;0.00 / month</div>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="resetDailyMealSpend()">Reset</button>
-                                <button type="button" class="btn btn-primary btn-sm" onclick="logDailyFoodAsExpense()">+ Log Food Expense</button>
-                            </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.8rem; font-weight: 700;">🌙 Dinner Today (₦)</label>
+                            <input type="number" id="mealDinner" class="form-control" placeholder="0.00" min="0" oninput="calculateDailyMealSpend()">
                         </div>
                     </div>
-
-                    <!-- Campus Daily Meal Calorie Calculator & Dynamic Plate Builder -->
-                    <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                            <div>
-                                <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
-                                    <span>🔥</span> Campus Meal Calorie Calculator &amp; Plate Builder
-                                </h4>
-                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-                                    Track exact portions eaten today (spoons of rice, slices of meat, chicken laps, wraps of eba). Calories scale accurately to your diet!
-                                </p>
-                            </div>
-                            <button type="button" class="btn btn-outline btn-sm" onclick="clearPlate()" style="font-size: 0.74rem; padding: 4px 10px;">
-                                🔄 Clear Plate
-                            </button>
+                    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Food Spent Today</div>
+                            <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);" id="totalDailyMealSpendText">₦0.00</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);" id="monthlyMealProjectionText">Monthly food projection: ₦0.00 / month</div>
                         </div>
-
-                        <!-- 1. Interactive Portion-Based Food Selector -->
-                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px;">
-                            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">
-                                🍽️ Add Food &amp; Exact Portions to Plate
-                            </div>
-                            <div class="calorie-input-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: end;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label style="font-size: 0.74rem; font-weight: 700; margin-bottom: 4px; display: block;">Select Food Item</label>
-                                    <select id="plateFoodSelect" class="form-control" style="font-size: 0.85rem; padding: 7px 10px;" onchange="onPlateFoodSelected()">
-                                        <!-- Injected dynamically by initCaloriePlateBuilder() -->
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label style="font-size: 0.74rem; font-weight: 700; margin-bottom: 4px; display: block;">Quantity</label>
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        <button type="button" class="btn btn-outline btn-sm" onclick="adjustPlateInputQty(-1)" style="padding: 6px 10px; font-weight: 800; line-height: 1;">-</button>
-                                        <input type="number" id="plateFoodQty" class="form-control" value="2" min="0.5" max="25" step="0.5" style="text-align: center; font-size: 0.85rem; padding: 7px 4px; font-weight: 700;" onchange="onPlateQtyChanged()">
-                                        <button type="button" class="btn btn-outline btn-sm" onclick="adjustPlateInputQty(1)" style="padding: 6px 10px; font-weight: 800; line-height: 1;">+</button>
-                                    </div>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label style="font-size: 0.74rem; font-weight: 700; margin-bottom: 4px; display: block;">Serving Unit</label>
-                                    <div id="plateFoodUnitBadge" style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 8px; font-size: 0.82rem; font-weight: 700; color: var(--accent-green); text-align: center; white-space: nowrap;">
-                                        spoons
-                                    </div>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="addSelectedFoodToPlate()" style="padding: 8px 14px; font-size: 0.82rem; white-space: nowrap; font-weight: 700; width: 100%;">
-                                        + Add to Plate
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. Plain English Natural Language Box -->
-                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px;">
-                            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
-                                💬 Or Type What You Ate (Scales Automatically)
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="calorieNaturalInput" class="form-control" placeholder="e.g. 2 spoons of rice, 1 spoon beans, 1 slice of meat, and 1 chicken lap..." onkeydown="if(event.key==='Enter'){parseNaturalMealToPlate();}">
-                                <button type="button" class="btn btn-primary btn-sm" onclick="parseNaturalMealToPlate()" style="white-space: nowrap; padding: 8px 14px; font-weight: 700;">
-                                    Scale &amp; Add
-                                </button>
-                            </div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px;">
-                                💡 Campus parser recognizes: <em>"2 spoons of rice"</em>, <em>"1 slice of meat"</em>, <em>"1 chicken lap"</em>, <em>"1 wrap eba"</em>, <em>"2 packs indomie"</em>, <em>"1 slice fish"</em>...
-                            </div>
-                        </div>
-
-                        <!-- 3. Campus Quick-Add Portion Chips -->
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">
-                                ⚡ Quick-Add Campus Servings (+1 Tap):
-                            </div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="calorieQuickChips">
-                                <!-- Populated dynamically by JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- 4. Active Plate Items Breakdown & Total Scaled Calories -->
-                        <div id="caloriePlateResultCard" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
-                                <div>
-                                    <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">Today's Plate Breakdown</span>
-                                    <span id="plateItemCountBadge" style="font-size: 0.75rem; color: var(--text-muted); margin-left: 6px;">(0 items)</span>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-amber); line-height: 1;" id="calorieTotalCount">0 kcal</div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted);">Scaled Energy Total</div>
-                                </div>
-                            </div>
-
-                            <!-- Dynamic List of Items on Plate -->
-                            <div id="plateItemsList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-                                <!-- Injected dynamically by renderCaloriePlate() -->
-                            </div>
-
-                            <!-- Daily Target Progress Bar -->
-                            <div style="margin-bottom: 10px;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">
-                                    <span>Daily Student Energy Goal (2,200 kcal)</span>
-                                    <span id="calorieTargetPct" style="font-weight: 700; color: var(--text-main);">0%</span>
-                                </div>
-                                <div class="progress-track" style="height: 10px; border-radius: 5px;">
-                                    <div class="progress-fill" id="calorieProgressBar" style="width: 0%; background: var(--accent-amber); border-radius: 5px; transition: width 0.3s ease;"></div>
-                                </div>
-                            </div>
-
-                            <div style="font-size: 0.78rem; line-height: 1.4; color: var(--text-muted); background: var(--surface-subtle); border-radius: var(--radius-sm); padding: 10px;" id="calorieAdviceText">
-                                🍽️ Your plate is empty. Add spoons of rice, slices of meat, or chicken laps above to calculate scaled energy!
-                            </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="resetDailyMealSpend()">Reset</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="logDailyFoodAsExpense()">+ Log Food Expense</button>
                         </div>
                     </div>
                 </div>
@@ -4508,68 +4374,136 @@
             const canvas = document.getElementById("burnChart");
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
-            const w = (canvas.parentElement && canvas.parentElement.clientWidth) || 300;
-            const h = (canvas.parentElement && canvas.parentElement.clientHeight) || 200;
-            canvas.width = w;
-            canvas.height = h;
+            const parent = canvas.parentElement;
+            const w = (parent && parent.clientWidth > 0) ? parent.clientWidth : 320;
+            const h = (parent && parent.clientHeight > 0) ? parent.clientHeight : 220;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.floor(w * dpr);
+            canvas.height = Math.floor(h * dpr);
+            canvas.style.width = w + "px";
+            canvas.style.height = h + "px";
+            if (ctx.scale) ctx.scale(dpr, dpr);
+
+            const isDark = (typeof document !== 'undefined' && document.body && document.body.classList) ? document.body.classList.contains("dark-mode") : false;
+            ctx.clearRect(0, 0, w, h);
 
             // Generate last 7 days data
             const days = [];
             const amounts = [];
+            const dayNames = [];
             const now = new Date();
 
             for (let i = 6; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(now.getDate() - i);
-                const str = d.toISOString().split('T')[0];
-                const dayName = d.toLocaleDateString("en-US", { weekday: 'short' });
-                days.push(dayName);
+                const isoStr = d.toISOString().split('T')[0];
+                const dayName = i === 0 ? "Today" : d.toLocaleDateString("en-US", { weekday: 'short' });
+                days.push(isoStr);
+                dayNames.push(dayName);
 
-                // calculate spend on that day
                 let sum = 0;
-                appData.transactions.forEach(t => {
-                    if (t.type === "expense" && t.date === str) sum += t.amount;
+                (appData.transactions || []).forEach(t => {
+                    if (t.type === "expense" && t.date === isoStr) {
+                        sum += Number(t.amount) || 0;
+                    }
                 });
                 amounts.push(sum);
             }
 
             const maxAmount = Math.max(...amounts, 5000);
-            ctx.clearRect(0, 0, w, h);
+            const total7Days = amounts.reduce((a, b) => a + b, 0);
 
+            const paddingLeft = 44;
+            const paddingRight = 14;
+            const paddingTop = 26;
             const paddingBottom = 26;
-            const paddingTop = 16;
-            const chartHeight = h - paddingBottom - paddingTop;
-            const barWidth = Math.max(14, (w / 7) - 16);
+            const chartW = w - paddingLeft - paddingRight;
+            const chartH = h - paddingTop - paddingBottom;
+            const baselineY = h - paddingBottom;
+
+            // Draw Y-axis guide gridlines (100%, 50%, 0%)
+            const levels = [
+                { val: maxAmount, y: paddingTop },
+                { val: Math.round(maxAmount / 2), y: paddingTop + (chartH / 2) },
+                { val: 0, y: baselineY }
+            ];
+
+            levels.forEach(lvl => {
+                ctx.beginPath();
+                ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
+                ctx.lineWidth = 1;
+                ctx.moveTo(paddingLeft, lvl.y);
+                ctx.lineTo(w - paddingRight, lvl.y);
+                ctx.stroke();
+
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                const label = lvl.val >= 1000 ? `₦${Math.round(lvl.val / 1000)}k` : `₦${lvl.val}`;
+                ctx.fillText(label, paddingLeft - 6, lvl.y);
+            });
+
+            // 7-day total top-right indicator
+            ctx.fillStyle = isDark ? "#34d399" : "#059669";
+            ctx.font = "bold 10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.textAlign = "right";
+            ctx.textBaseline = "top";
+            ctx.fillText(`7d Total: ${formatNaira(total7Days)}`, w - paddingRight, 6);
 
             // Draw bars
+            const colW = chartW / 7;
+            const barW = Math.min(24, Math.max(12, colW - 8));
+
             days.forEach((day, idx) => {
                 const val = amounts[idx];
-                const barH = (val / maxAmount) * chartHeight;
-                const x = idx * (w / 7) + ((w / 7) - barWidth) / 2;
-                const y = h - paddingBottom - barH;
+                const x = paddingLeft + (idx * colW) + (colW - barW) / 2;
+                const isToday = idx === 6;
 
-                // Bar gradient
-                const grad = ctx.createLinearGradient(0, y, 0, h - paddingBottom);
-                grad.addColorStop(0, '#059669');
-                grad.addColorStop(1, '#10b981');
-
-                ctx.fillStyle = val > 0 ? grad : '#cbd5e1';
-                ctx.beginPath();
-                ctx.roundRect(x, y, barWidth, Math.max(4, barH), [4, 4, 0, 0]);
-                ctx.fill();
-
-                // Day Label
-                ctx.fillStyle = '#64748b';
-                ctx.font = '11px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(day, x + barWidth / 2, h - 8);
-
-                // Amount text if significant
                 if (val > 0) {
-                    ctx.fillStyle = '#0f172a';
-                    ctx.font = 'bold 9px sans-serif';
-                    ctx.fillText(`₦${Math.round(val / 1000)}k`, x + barWidth / 2, y - 4);
+                    const barH = Math.max(6, (val / maxAmount) * chartH);
+                    const y = baselineY - barH;
+
+                    // Bar gradient
+                    const grad = ctx.createLinearGradient(0, y, 0, baselineY);
+                    grad.addColorStop(0, "#10b981");
+                    grad.addColorStop(1, "#059669");
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    if (ctx.roundRect) {
+                        ctx.roundRect(x, y, barW, barH, [4, 4, 0, 0]);
+                    } else {
+                        ctx.rect(x, y, barW, barH);
+                    }
+                    ctx.fill();
+
+                    // Amount label above bar
+                    ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+                    ctx.font = "bold 9px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "bottom";
+                    const shortVal = val >= 10000 ? `₦${Math.round(val / 1000)}k` : (val >= 1000 ? `₦${(val / 1000).toFixed(1)}k` : `₦${val}`);
+                    ctx.fillText(shortVal, x + barW / 2, y - 2);
+                } else {
+                    // Subtle placeholder line for 0 spend day
+                    ctx.fillStyle = isDark ? "#334155" : "#e2e8f0";
+                    ctx.beginPath();
+                    if (ctx.roundRect) {
+                        ctx.roundRect(x, baselineY - 4, barW, 4, [2, 2, 0, 0]);
+                    } else {
+                        ctx.rect(x, baselineY - 4, barW, 4);
+                    }
+                    ctx.fill();
                 }
+
+                // Day Label below baseline
+                ctx.fillStyle = isToday ? "#10b981" : (isDark ? "#94a3b8" : "#64748b");
+                ctx.font = (isToday ? "bold " : "") + "10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                ctx.fillText(dayNames[idx], x + barW / 2, baselineY + 6);
             });
         }
 
@@ -4577,67 +4511,142 @@
             const canvas = document.getElementById("categoryDonutChart");
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
-            const w = (canvas.parentElement && canvas.parentElement.clientWidth) || 300;
-            const h = (canvas.parentElement && canvas.parentElement.clientHeight) || 200;
-            canvas.width = w;
-            canvas.height = h;
+            const parent = canvas.parentElement;
+            const w = (parent && parent.clientWidth > 0) ? parent.clientWidth : 320;
+            const h = (parent && parent.clientHeight > 0) ? parent.clientHeight : 220;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.floor(w * dpr);
+            canvas.height = Math.floor(h * dpr);
+            canvas.style.width = w + "px";
+            canvas.style.height = h + "px";
+            if (ctx.scale) ctx.scale(dpr, dpr);
+
+            const isDark = (typeof document !== 'undefined' && document.body && document.body.classList) ? document.body.classList.contains("dark-mode") : false;
+            ctx.clearRect(0, 0, w, h);
 
             // Group expenses by category
             const catMap = {};
             let total = 0;
-            appData.transactions.forEach(t => {
+            (appData.transactions || []).forEach(t => {
                 if (t.type === "expense") {
-                    catMap[t.category] = (catMap[t.category] || 0) + t.amount;
-                    total += t.amount;
+                    const cat = t.category || "General Expense";
+                    const amt = Number(t.amount) || 0;
+                    catMap[cat] = (catMap[cat] || 0) + amt;
+                    total += amt;
                 }
             });
 
-            ctx.clearRect(0, 0, w, h);
             if (total === 0) {
-                ctx.fillStyle = "#94a3b8";
-                ctx.font = "13px sans-serif";
+                // Empty state donut ring
+                const cx = w / 2;
+                const cy = h / 2 - 10;
+                const radius = Math.min(cx, cy) - 20;
+                const innerRadius = radius * 0.65;
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+                ctx.arc(cx, cy, innerRadius, 2 * Math.PI, 0, true);
+                if (ctx.closePath) ctx.closePath();
+                ctx.fillStyle = isDark ? "#334155" : "#e2e8f0";
+                ctx.fill();
+
+                ctx.fillStyle = isDark ? "#cbd5e1" : "#475569";
+                ctx.font = "bold 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
                 ctx.textAlign = "center";
-                ctx.fillText("No expense transactions logged yet", w / 2, h / 2);
+                ctx.textBaseline = "middle";
+                ctx.fillText("No Expenses Logged", cx, cy);
+
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                ctx.fillText("Log an expense to see category split", cx, cy + 18);
                 return;
             }
 
-            const colors = ['#059669', '#06b6d4', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#64748b'];
-            let startAngle = -0.5 * Math.PI;
-            const cx = w * 0.38;
+            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#64748b'];
+
+            // Sort categories descending
+            const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+            const categories = [];
+            let otherSum = 0;
+            sorted.forEach((item, idx) => {
+                if (idx < 4) {
+                    categories.push({ name: item[0], amount: item[1] });
+                } else {
+                    otherSum += item[1];
+                }
+            });
+            if (otherSum > 0) {
+                categories.push({ name: 'Other', amount: otherSum });
+            }
+
+            const isNarrow = w < 340;
+            const cx = isNarrow ? (w * 0.30) : (w * 0.34);
             const cy = h / 2;
-            const radius = Math.min(cx, cy) - 14;
+            const radius = Math.min(cx - 6, cy - 14);
             const innerRadius = radius * 0.62;
 
-            const categories = Object.keys(catMap);
-            categories.forEach((cat, idx) => {
-                const sliceAngle = (catMap[cat] / total) * 2 * Math.PI;
+            // Draw donut slices
+            let startAngle = -0.5 * Math.PI;
+            categories.forEach((catItem, idx) => {
+                const sliceAngle = (catItem.amount / total) * 2 * Math.PI;
                 ctx.beginPath();
                 ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
                 ctx.arc(cx, cy, innerRadius, startAngle + sliceAngle, startAngle, true);
-                ctx.closePath();
+                if (ctx.closePath) ctx.closePath();
                 ctx.fillStyle = colors[idx % colors.length];
                 ctx.fill();
+
+                // Crisp boundary gap between slices
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = isDark ? "#1e293b" : "#ffffff";
+                ctx.stroke();
+
                 startAngle += sliceAngle;
             });
 
-            // Center Text
-            ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText("Top Spends", cx, cy);
+            // Center Text inside donut hole
+            const shortTotal = total >= 1000000 ? `₦${(total / 1000000).toFixed(1)}M` : (total >= 10000 ? `₦${Math.round(total / 1000)}k` : `₦${Math.round(total)}`);
+            ctx.fillStyle = isDark ? "#f8fafc" : "#0f172a";
+            ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(shortTotal, cx, cy - 6);
 
-            // Legend on right
-            const legendX = w * 0.72;
-            let legendY = 24;
-            categories.slice(0, 5).forEach((cat, idx) => {
-                ctx.fillStyle = colors[idx % colors.length];
-                ctx.fillRect(legendX - 16, legendY - 8, 10, 10);
-                ctx.fillStyle = '#475569';
-                ctx.font = '10px sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText(cat.split(' ')[0] + ` (${Math.round((catMap[cat] / total) * 100)}%)`, legendX, legendY);
-                legendY += 22;
+            ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+            ctx.font = "9px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            ctx.fillText("Total Spent", cx, cy + 9);
+
+            // Legend on the right side
+            const legendX = isNarrow ? (w * 0.58) : (w * 0.64);
+            const itemH = 26;
+            let legendY = Math.max(14, (h - (categories.length * itemH)) / 2 + 8);
+
+            categories.forEach((catItem, idx) => {
+                const pct = Math.round((catItem.amount / total) * 100);
+                const col = colors[idx % colors.length];
+
+                // Legend Color Circle
+                ctx.beginPath();
+                ctx.arc(legendX + 4, legendY, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = col;
+                ctx.fill();
+
+                // Category Title
+                ctx.fillStyle = isDark ? "#e2e8f0" : "#1e293b";
+                ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "middle";
+                const catShort = catItem.name.length > 13 ? catItem.name.substring(0, 12) + "…" : catItem.name;
+                ctx.fillText(catShort, legendX + 13, legendY - 5);
+
+                // Percentage and amount
+                const amtLabel = catItem.amount >= 1000 ? `₦${Math.round(catItem.amount / 1000)}k` : `₦${catItem.amount}`;
+                ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+                ctx.font = "10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                ctx.fillText(`${pct}% • ${amtLabel}`, legendX + 13, legendY + 7);
+
+                legendY += itemH;
             });
         }
 
@@ -7024,49 +7033,58 @@
                     : (currentUser.email ? currentUser.email.split('@')[0] : 'Student');
 
                 const isCloud = !!supabaseClient;
+                const email = currentUser.email || 'Registered Student';
+                const campus = (currentUser.user_metadata && currentUser.user_metadata.campus) || 'Campus Edition';
 
                 container.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <div id="headerSyncStatus" style="font-size: 0.72rem;"></div>
-                        <button class="btn btn-outline btn-sm" onclick="loadUserDataFromCloud(true)" title="Sync Cross-Device Data with Cloud SQL" style="padding: 4px 8px; font-size: 0.72rem; display: inline-flex; align-items: center; gap: 3px; border-radius: 8px;">
-                            <span>🔄</span> <span class="hide-on-mobile">Sync</span>
-                        </button>
-                        <div class="dropdown-wrap" id="userMenuWrap" style="position: relative;">
-                            <button class="btn-icon" onclick="toggleUserDropdown(event)" style="width: auto; padding: 0 10px; gap: 5px; font-weight: 700; font-size: 0.78rem; background: var(--surface-subtle); border-color: var(--primary);" title="Account & Sync">
-                                <span>👤</span> <span id="headerUserDisplayName">${name}</span> <span style="font-size: 0.6rem;">▼</span>
-                            </button>
-                            <div class="dropdown-menu" id="userDropdownMenu" style="right: 0; min-width: 230px; text-align: left;">
-                                <div style="padding: 10px 14px; border-bottom: 1px solid var(--border);">
-                                    <div style="font-size: 0.72rem; color: var(--text-muted);">Signed in as</div>
-                                    <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-main); word-break: break-all;">${currentUser.email}</div>
-                                    <div style="margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; background: var(--primary-light); color: var(--primary); padding: 2px 6px; border-radius: 10px; font-weight: 700;">
-                                        <span>🟢</span> ${isCloud ? 'Cloud SQL Active' : 'Account Active (Local)'}
-                                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #10b981); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 800; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);">
+                                ${name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);" id="headerUserDisplayName">${name}</div>
+                                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                                    ${email} &bull; 🏫 ${campus}
                                 </div>
-                                ${isCloud ? `
-                                    <div class="dropdown-item" onclick="loadUserDataFromCloud(); closeUserDropdown();">
-                                        <span>🔄 Refresh Cloud Data</span>
+                                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                    <div id="headerSyncStatus" style="font-size: 0.76rem; font-weight: 700; color: var(--success); background: var(--primary-light); padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 5px;">
+                                        <span>🟢</span> ${isCloud ? 'Live Sync Active (Cloud SQL)' : 'Account Active (Local)'}
                                     </div>
-                                    <div class="dropdown-item" onclick="syncStateToCloud(true); closeUserDropdown();">
-                                        <span>☁️ Backup to Cloud</span>
-                                    </div>
-                                ` : ''}
-                                <div class="dropdown-divider"></div>
-                                <div class="dropdown-item" onclick="handleAuthSignOut(); closeUserDropdown();" style="color: var(--danger); font-weight: 700;">
-                                    <span>🚪 Log Out (${name})</span>
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-outline btn-sm" onclick="handleAuthSignOut()" title="Log Out of NairaFlow" style="padding: 4px 8px; font-size: 0.75rem; color: var(--danger); border-color: var(--danger); font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">
-                            <span>🚪</span> <span class="hide-on-mobile">Log Out</span>
-                        </button>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                            <button class="btn btn-outline btn-sm" onclick="loadUserDataFromCloud(true)" title="Sync Cross-Device Data with Cloud SQL" style="padding: 8px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; font-weight: 700;">
+                                <span>🔄</span> <span>Sync Now</span>
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="syncStateToCloud(true)" title="Backup Data to Cloud" style="padding: 8px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; font-weight: 700;">
+                                <span>☁️</span> <span>Cloud Backup</span>
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="handleAuthSignOut()" title="Log Out of NairaFlow" style="padding: 8px 14px; font-size: 0.82rem; color: var(--danger); border-color: var(--danger); font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                                <span>🚪</span> <span>Log Out (${name})</span>
+                            </button>
+                        </div>
                     </div>
                 `;
             } else {
                 container.innerHTML = `
-                    <button class="btn btn-primary btn-sm" onclick="openAuthModal()" style="padding: 4px 10px; font-weight: 700; font-size: 0.78rem; border-radius: 8px;">
-                        <span>🔑 Sign In</span>
-                    </button>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                        <div>
+                            <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);" id="headerUserDisplayName">Guest / Offline Student</div>
+                            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                                Sign in with your account to synchronize your spendable balance and course dues between your laptop and phone in real time.
+                            </div>
+                            <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                <div id="headerSyncStatus" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); background: var(--border); padding: 3px 8px; border-radius: 12px;">
+                                    <span>📱</span> Local Offline Mode
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openAuthModal()" style="padding: 8px 16px; font-weight: 700; font-size: 0.85rem; border-radius: 8px;">
+                            <span>🔑 Sign In / Create Account</span>
+                        </button>
+                    </div>
                 `;
             }
 
@@ -7078,7 +7096,6 @@
             const menu = document.getElementById("userDropdownMenu");
             if (menu) {
                 menu.classList.toggle("show");
-                menu.classList.toggle("open");
             }
         }
 
@@ -7086,62 +7103,23 @@
             const menu = document.getElementById("userDropdownMenu");
             if (menu) {
                 menu.classList.remove("show");
-                menu.classList.remove("open");
             }
         }
 
         function updateSettingsAccountSection() {
-            const el = document.getElementById("settingsAccountCardBody");
             const menuLogin = document.getElementById("menuLoginItem");
             const menuLogout = document.getElementById("menuLogoutItem");
-            const isCloud = !!supabaseClient;
-
             if (currentUser) {
                 const name = (currentUser.user_metadata && currentUser.user_metadata.full_name) 
                     || (currentUser.email ? currentUser.email.split('@')[0] : 'User');
-                const campus = (currentUser.user_metadata && currentUser.user_metadata.campus) || 'Campus Edition';
-
                 if (menuLogin) menuLogin.style.display = "none";
                 if (menuLogout) {
                     menuLogout.style.display = "flex";
                     menuLogout.innerHTML = `<span>🚪 Log Out (${name})</span>`;
                 }
-
-                if (el) {
-                    el.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
-                            <div>
-                                <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">${name}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">${currentUser.email || 'Registered User'} &bull; 🏫 ${campus}</div>
-                                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; background: var(--primary-light); color: var(--primary); padding: 3px 8px; border-radius: 12px; font-weight: 700;">
-                                    <span>🟢</span> ${isCloud ? 'Cloud SQL Active (Multi-Device Sync)' : 'Local Account Active'}
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn btn-danger btn-sm" onclick="handleAuthSignOut()">
-                                    <span>🚪 Log Out</span>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
             } else {
                 if (menuLogin) menuLogin.style.display = "flex";
                 if (menuLogout) menuLogout.style.display = "none";
-
-                if (el) {
-                    el.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: var(--surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
-                            <div>
-                                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Guest / Offline Mode</div>
-                                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Sign in or create an account to save and sync your campus budget safely.</div>
-                            </div>
-                            <button class="btn btn-primary btn-sm" onclick="openAuthModal()">
-                                <span>🔑 Sign In / Register</span>
-                            </button>
-                        </div>
-                    `;
-                }
             }
         }
 
@@ -7754,11 +7732,11 @@
             const el = document.getElementById("headerSyncStatus");
             if (el) {
                 if (isSyncing) {
-                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-size: 0.72rem; font-weight: 700;">🔄 Syncing...</span>`;
+                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-size: 0.76rem; font-weight: 700;">🔄 Syncing Cloud Data...</span>`;
                 } else if (currentUser && supabaseClient) {
-                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--success); font-size: 0.72rem; font-weight: 700;">🟢 Live Synced</span>`;
+                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--success); font-size: 0.76rem; font-weight: 700;">🟢 Live Synced (Cloud SQL)</span>`;
                 } else {
-                    el.innerHTML = ``;
+                    el.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">📱 Local Offline Mode</span>`;
                 }
             }
         }
