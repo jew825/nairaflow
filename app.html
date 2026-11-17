@@ -1482,6 +1482,323 @@
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             }
         }
+
+        /* ==========================================================================
+           OPAY-STYLE CLEAN NEOBANK DESIGN SYSTEM
+           ========================================================================== */
+        .opay-user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 4px 2px;
+        }
+
+        .opay-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+            border: 2px solid var(--surface);
+        }
+
+        .opay-hero-card {
+            background: linear-gradient(135deg, #059669 0%, #047857 60%, #065f46 100%);
+            color: #ffffff;
+            border-radius: 20px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 28px -4px rgba(5, 150, 105, 0.4), 0 0 1px 1px rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        [data-theme="dark"] .opay-hero-card {
+            background: linear-gradient(135deg, #064e3b 0%, #043d2f 60%, #032e23 100%);
+            box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .opay-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .opay-bal-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .opay-bal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .opay-bal-amount {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: #ffffff;
+        }
+
+        .btn-opay-add {
+            background: #ffffff;
+            color: #047857;
+            font-weight: 800;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .btn-opay-add:hover {
+            background: #f0fdf4;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-opay-add:active {
+            transform: scale(0.96);
+        }
+
+        .opay-card-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.22);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .opay-strip-item .lbl {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .opay-strip-item .val {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: block;
+        }
+
+        /* OPay 5-Service Action Grid */
+        .opay-services-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        @media (max-width: 500px) {
+            .opay-services-grid {
+                gap: 4px;
+                padding: 12px 4px;
+            }
+        }
+
+        .opay-service-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            gap: 6px;
+            padding: 4px 2px;
+            font-family: inherit;
+            transition: transform 0.15s ease;
+        }
+
+        .opay-service-btn:active {
+            transform: scale(0.92);
+        }
+
+        .opay-service-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.15s ease;
+        }
+
+        @media (max-width: 400px) {
+            .opay-service-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+        }
+
+        .opay-service-btn span {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Compact OPay Stats Strip */
+        .opay-stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .opay-stat-pill {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--card-shadow);
+        }
+
+        .opay-stat-pill .lbl {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 3px;
+        }
+
+        .opay-stat-pill .val {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* OPay Collapsible Accordion Card */
+        .opay-accordion-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: border-color 0.15s ease;
+        }
+
+        .opay-accordion-header {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: left;
+        }
+
+        .opay-accordion-header:hover {
+            background: var(--surface-subtle);
+        }
+
+        /* Bottom Nav More Dropdown Menu */
+        .m-nav-dropdown-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 48;
+            display: none;
+        }
+        .m-nav-dropdown-backdrop.open {
+            display: block;
+        }
+
+        .m-nav-dropdown-menu {
+            position: fixed;
+            bottom: 80px;
+            right: 14px;
+            left: 14px;
+            max-width: 380px;
+            margin-left: auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--card-shadow-lg);
+            z-index: 49;
+            display: none;
+            padding: 10px;
+            animation: fadeIn 0.15s ease-out;
+        }
+        .m-nav-dropdown-menu.open {
+            display: block;
+        }
+
+        .m-nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            transition: background 0.15s ease;
+        }
+        .m-nav-dropdown-item:hover {
+            background: var(--surface-subtle);
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -1721,179 +2038,200 @@
                  ========================================== -->
             <section id="tab-dashboard" class="tab-section active">
 
-                <!-- SAPA RUNWAY HERO -->
-                <div class="runway-hero">
-                    <div class="runway-top">
-                        <div class="runway-title">🛡️ Nara Flow</div>
+                <!-- 1. OPAY TOP USER WELCOME ROW -->
+                <div class="opay-user-row">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="opay-avatar" id="opayUserAvatar">👤</div>
+                        <div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">Welcome back,</div>
+                            <div style="font-size: 1.12rem; font-weight: 800; color: var(--text-main);" id="dashboardGreetingName">Student</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="brand-pill" style="margin: 0;">🎓 Campus Active</span>
+                    </div>
+                </div>
+
+                <!-- 2. OPAY SIGNATURE PRIMARY BALANCE CARD -->
+                <div class="opay-hero-card">
+                    <div class="opay-card-top">
+                        <div class="opay-bal-title">
+                            <span>Available Balance</span>
+                            <span onclick="togglePrivacyMask()" style="cursor: pointer; opacity: 0.85; font-size: 0.95rem;" title="Toggle Hide/Show Balance">👁️</span>
+                        </div>
                         <div class="runway-badge" id="runwayStatusBadge">Calculating...</div>
                     </div>
-                    <div class="runway-days-num" id="runwayDaysCount">0 Days</div>
-                    <div class="runway-days-lbl">of survival runway remaining before your cash hits zero</div>
+                    <div class="opay-bal-row">
+                        <div class="opay-bal-amount naira-mask" id="cardTotalBalance">&#8358;0.00</div>
+                        <button class="btn-opay-add" onclick="openAddMoneyModal()" title="Add Money to Account">
+                            ➕ Add Money
+                        </button>
+                    </div>
 
-                    <div class="runway-metrics-strip">
-                        <div class="runway-metric-item">
+                    <!-- Compact OPay Metric Strip (Clean & Uncongested) -->
+                    <div class="opay-card-strip">
+                        <div class="opay-strip-item">
+                            <span class="lbl">Safe Daily</span>
+                            <span class="val naira-mask" id="runwaySafeDaily">&#8358;0.00 / day</span>
+                        </div>
+                        <div class="opay-strip-item">
+                            <span class="lbl">Sapa Runway</span>
+                            <span class="val" id="runwayDaysCount">0 Days</span>
+                        </div>
+                        <div class="opay-strip-item">
                             <span class="lbl">Spendable Cash</span>
                             <span class="val naira-mask" id="runwaySpendableBal">&#8358;0.00</span>
                         </div>
-                        <div class="runway-metric-item">
-                            <span class="lbl">Daily Burn Rate</span>
-                            <span class="val naira-mask" id="runwayDailyBurn">&#8358;0.00 / day</span>
-                        </div>
-                        <div class="runway-metric-item">
-                            <span class="lbl">Safe Daily Limit</span>
-                            <span class="val naira-mask" id="runwaySafeDaily">&#8358;0.00 / day</span>
-                        </div>
+                    </div>
+                    <!-- Hidden elements preserving required classes for renderDashboard() compatibility -->
+                    <span class="runway-title" style="display: none;">🛡️ NairaFlow</span>
+                    <span class="runway-days-lbl" style="display: none;">runway days</span>
+                </div>
+
+                <!-- 3. OPAY QUICK SERVICE ACTION GRID (5 CLEAN ACTIONS) -->
+                <div class="opay-services-grid">
+                    <button class="opay-service-btn" onclick="openAddMoneyModal()" title="Add Money">
+                        <div class="opay-service-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">➕</div>
+                        <span>Add Money</span>
+                    </button>
+                    <button class="opay-service-btn" onclick="openTransactionModal('expense')" title="Log Expense">
+                        <div class="opay-service-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">💸</div>
+                        <span>Send / Spend</span>
+                    </button>
+                    <button class="opay-service-btn" onclick="switchTab('campus')" title="Campus Hub Dues">
+                        <div class="opay-service-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">🎓</div>
+                        <span>Campus Hub</span>
+                    </button>
+                    <button class="opay-service-btn" onclick="switchTab('todos')" title="Errands & Tasks">
+                        <div class="opay-service-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">📝</div>
+                        <span>Errands</span>
+                    </button>
+                    <button class="opay-service-btn" onclick="switchTab('debts')" title="Coursemate IOUs">
+                        <div class="opay-service-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">🤝</div>
+                        <span>IOU / Debts</span>
+                    </button>
+                </div>
+
+                <!-- 4. OPAY COMPACT MONTHLY INFLOW / OUTFLOW STATS -->
+                <div class="opay-stats-row">
+                    <div class="opay-stat-pill">
+                        <span class="lbl">Inflow 📈</span>
+                        <span class="val naira-mask" id="cardMonthlyIncome">&#8358;0.00</span>
+                    </div>
+                    <div class="opay-stat-pill">
+                        <span class="lbl">Outflow 📉</span>
+                        <span class="val naira-mask" id="cardMonthlyExpense">&#8358;0.00</span>
+                    </div>
+                    <div class="opay-stat-pill">
+                        <span class="lbl">Locked 🔒</span>
+                        <span class="val naira-mask" id="cardLockedSavings">&#8358;0.00</span>
+                    </div>
+                    <div class="opay-stat-pill">
+                        <span class="lbl">Daily Burn ⏱️</span>
+                        <span class="val naira-mask" id="runwayDailyBurn">&#8358;0.00 / day</span>
                     </div>
                 </div>
 
-                <!-- TOP SUMMARY METRIC CARDS -->
-                <div class="metrics-grid">
-                    <div class="metric-card primary">
-                        <div class="metric-label">Total Spendable Balance <span>💼</span></div>
-                        <div class="metric-value naira-mask" id="cardTotalBalance">&#8358;0.00</div>
-                        <div class="metric-sub">Across Banks & Fintechs</div>
-                    </div>
-                    <div class="metric-card success">
-                        <div class="metric-label">This Month's Inflow <span>📈</span></div>
-                        <div class="metric-value naira-mask" id="cardMonthlyIncome">&#8358;0.00</div>
-                        <div class="metric-sub">Salary, Side Hustles, Awoof</div>
-                    </div>
-                    <div class="metric-card danger">
-                        <div class="metric-label">This Month's Outflow <span>📉</span></div>
-                        <div class="metric-value naira-mask" id="cardMonthlyExpense">&#8358;0.00</div>
-                        <div class="metric-sub">Bills, Market & Transports</div>
-                    </div>
-                    <div class="metric-card amber">
-                        <div class="metric-label">Locked Savings <span>🔒</span></div>
-                        <div class="metric-value naira-mask" id="cardLockedSavings">&#8358;0.00</div>
-                        <div class="metric-sub">PiggyVest / Cowrywise</div>
-                    </div>
-                </div>
-
-                <!-- TODAY'S SNAPSHOT & ONE-TAP QUICK LOG -->
-                <div class="today-card">
-                    <div class="progress-header">
-                        <span>Today's Spending vs Safe Daily Limit</span>
-                        <span id="todayProgressText">&#8358;0.00 / &#8358;0.00</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="todayProgressBar"></div>
-                    </div>
-
-                    <!-- Custom Spend & Withdrawal Search / Quick Logger -->
-                    <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
-                        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>🔍 Search / Custom Spend & Withdrawal Logger</span>
-                            <span style="font-size: 0.72rem; color: var(--primary); font-weight: 600;">Instant Spend Log</span>
-                        </div>
-                        <div class="quick-log-input-row">
-                            <input type="text" id="quickCustomTitle" class="form-control" style="flex: 2; min-width: 180px;" placeholder="What did you buy? e.g. Made a withdrawal of 10,000 Naira" oninput="filterQuickPresets(this.value)">
-                            <input type="number" id="quickCustomAmount" class="form-control" style="flex: 1; min-width: 120px;" placeholder="Amount (₦)">
-                            <select id="quickCustomWallet" class="form-control" style="flex: 1; min-width: 140px;">
-                                <!-- Populated dynamically -->
-                            </select>
-                            <button class="btn btn-primary" onclick="handleQuickCustomSpend()" style="white-space: nowrap; padding: 10px 16px;">
-                                + Log Spend
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
-                        <div class="quick-log-title" style="margin-bottom: 0;">&#9889; One-Tap Quick Presets</div>
-                        <button class="btn btn-outline btn-sm" onclick="openPresetPricesModal()" style="font-size: 0.75rem; padding: 4px 10px;" title="Change preset prices to match your campus transport and food">
-                            ✏️ Change Preset Prices
-                        </button>
-                    </div>
-                    <div class="quick-log-grid" id="quickPresetsContainer">
-                        <button class="quick-btn" onclick="quickLogSpend('ATM / POS Cash Withdrawal', 10000, 'Bank & Transaction Fees', 'Cash in Hand')">
-                            <div class="btn-icon-label"><span>🏧</span> Cash Withdrawal</div>
-                            <div class="btn-default-cost">&#8358;10,000</div>
-                        </button>
-                        <button class="quick-btn" onclick="quickLogSpend('Public Transport (Danfo / Keke)', 500, 'Transport', 'Cash in Hand')">
-                            <div class="btn-icon-label"><span>🚌</span> Danfo / Keke</div>
-                            <div class="btn-default-cost">&#8358;500</div>
-                        </button>
-                        <button class="quick-btn" onclick="quickLogSpend('Quick Meals / Eat Out (Mama Put)', 1500, 'Food & Groceries', 'Fintech (OPay/PalmPay)')">
-                            <div class="btn-icon-label"><span>🍲</span> Mama Put</div>
-                            <div class="btn-default-cost">&#8358;1,500</div>
-                        </button>
-                        <button class="quick-btn" onclick="quickLogSpend('MTN / Airtel Data Top-up', 2000, 'Telecoms & Subs', 'Fintech (OPay/PalmPay)')">
-                            <div class="btn-icon-label"><span>📱</span> Data / Airtime</div>
-                            <div class="btn-default-cost">&#8358;2,000</div>
-                        </button>
-                        <button class="quick-btn" onclick="quickLogSpend('POS Withdrawal Charges', 300, 'Bank & Transaction Fees', 'Cash in Hand')">
-                            <div class="btn-icon-label"><span>🏧</span> POS Fee</div>
-                            <div class="btn-default-cost">&#8358;300</div>
-                        </button>
-                        <button class="quick-btn" onclick="quickLogSpend('Fuel (PMS) for Generator/Car', 5000, 'Power & Utilities', 'Main Commercial Bank')">
-                            <div class="btn-icon-label"><span>⛽</span> Fuel / Gen</div>
-                            <div class="btn-default-cost">&#8358;5,000</div>
-                        </button>
-                        <button class="quick-btn" onclick="quickLogSpend('Drinking Water (Sachet Bag/Dispenser)', 600, 'Food & Groceries', 'Cash in Hand')">
-                            <div class="btn-icon-label"><span>💧</span> Pure Water</div>
-                            <div class="btn-default-cost">&#8358;600</div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- HIDDEN LEAKS CALLOUT CARD -->
-                <div class="leak-callout" id="leakCard">
-                    <div class="leak-icon">&#9888;&#65039;</div>
-                    <div>
-                        <div class="leak-title">Monthly Hidden Leak Alert</div>
-                        <div class="leak-desc" id="leakText">
-                            You've spent <strong class="naira-mask" id="leakAmount">&#8358;0.00</strong> this month purely on POS withdrawal charges, transfer surcharges, and bank alert fees.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MULTI-WALLET STRIP -->
-                <div class="card-header">
-                    <h3 class="card-title">&#128179; Multi-Wallet Accounts</h3>
+                <!-- 5. MULTI-WALLET ACCOUNTS STRIP -->
+                <div class="card-header" style="margin-bottom: 12px;">
+                    <h3 class="card-title" style="font-size: 1.05rem;">&#128179; Your Accounts & Wallets</h3>
                     <button class="btn btn-outline btn-sm" onclick="openWalletModal()">Manage Wallets</button>
                 </div>
                 <div class="wallets-strip" id="walletsContainer">
-                    <!-- Populated dynamically -->
+                    <!-- Populated dynamically with [➕ Add] on the left! -->
                 </div>
 
-                <!-- CHARTS & ANALYTICS -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">&#128202; 7-Day Spending Burn</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="burnChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">&#129684; Category Breakdown</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="categoryDonutChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DASHBOARD TO-DO & ERRANDS QUICK CARD -->
-                <div class="card" style="margin-top: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <!-- 6. TRANSACTION HISTORY ON FIRST PAGE (OPAY STYLE) -->
+                <div class="card" style="margin-bottom: 18px;">
+                    <div class="card-header" style="margin-bottom: 12px;">
                         <div>
-                            <h3 class="card-title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
-                                ✅ Cost-Linked Tasks & Errands
+                            <h3 class="card-title" style="font-size: 1.05rem;">
+                                📜 Transaction History
                             </h3>
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0;">
-                                Check off errands with attached costs to automatically log them as expenses.
-                            </p>
+                            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0;">Recent inflows & expenditures</p>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline btn-sm" onclick="openTodoModal()">+ Add Task</button>
-                            <button class="btn btn-primary btn-sm" onclick="switchTab('todos')">Open To-Dos &rarr;</button>
-                        </div>
+                        <a href="javascript:void(0)" onclick="switchTab('transactions')" style="font-size: 0.82rem; font-weight: 700; color: var(--primary); text-decoration: none;">
+                            View All &rarr;
+                        </a>
                     </div>
-                    <div id="dashboardTodosPreview">
-                        <!-- Populated by renderTodos() -->
+                    <div id="dashboardRecentTransactions" class="tx-list">
+                        <!-- Populated dynamically by renderRecentDashboardTransactions() -->
+                    </div>
+                </div>
+
+                <!-- 7. COLLAPSIBLE DROPDOWN FOR BOTTOM UTILITIES & TOOLS -->
+                <div class="opay-accordion-card">
+                    <button type="button" class="opay-accordion-header" onclick="toggleBottomToolsDropdown()" id="btnBottomToolsToggle">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>⚡ Quick Utilities, Spend Presets & Leaks</span>
+                            <span class="brand-pill" style="font-size: 0.65rem;">Tap to expand</span>
+                        </div>
+                        <span id="bottomToolsArrow" style="font-size: 1.1rem; transition: transform 0.2s ease;">▾</span>
+                    </button>
+                    <div id="bottomToolsDropdownBody" style="display: none; padding: 0 16px 16px 16px;">
+                        
+                        <!-- Today's Spend Progress -->
+                        <div class="today-card" style="margin: 12px 0 16px 0; padding: 14px 16px;">
+                            <div class="progress-header">
+                                <span>Today's Spending vs Safe Daily Limit</span>
+                                <span id="todayProgressText">&#8358;0.00 / &#8358;0.00</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="todayProgressBar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Custom Spend & Withdrawal Search / Quick Logger -->
+                        <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
+                            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                                <span>🔍 Search / Custom Spend & Withdrawal Logger</span>
+                                <span style="font-size: 0.72rem; color: var(--primary); font-weight: 600;">Instant Spend Log</span>
+                            </div>
+                            <div class="quick-log-input-row">
+                                <input type="text" id="quickCustomTitle" class="form-control" style="flex: 2; min-width: 180px;" placeholder="What did you buy? e.g. Withdrawal, Shawarma" oninput="filterQuickPresets(this.value)">
+                                <input type="number" id="quickCustomAmount" class="form-control" style="flex: 1; min-width: 120px;" placeholder="Amount (₦)">
+                                <select id="quickCustomWallet" class="form-control" style="flex: 1; min-width: 140px;">
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <button class="btn btn-primary" onclick="handleQuickCustomSpend()" style="white-space: nowrap; padding: 10px 16px;">
+                                    + Log Spend
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- One-Tap Quick Presets -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
+                            <div class="quick-log-title" style="margin-bottom: 0;">⚡ One-Tap Quick Presets</div>
+                            <button class="btn btn-outline btn-sm" onclick="openPresetPricesModal()" style="font-size: 0.75rem; padding: 4px 10px;">
+                                ✏️ Change Preset Prices
+                            </button>
+                        </div>
+                        <div class="quick-log-grid" id="quickPresetsContainer" style="margin-bottom: 16px;">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Hidden Leak Callout -->
+                        <div class="leak-callout" id="leakCard" style="margin-bottom: 16px;">
+                            <div class="leak-icon">&#9888;&#65039;</div>
+                            <div>
+                                <div class="leak-title">Monthly Hidden Leak Alert</div>
+                                <div class="leak-desc" id="leakText">
+                                    You've spent <strong class="naira-mask" id="leakAmount">&#8358;0.00</strong> this month on bank alert fees and POS surcharges.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cost-Linked Tasks Preview -->
+                        <div style="margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">✅ Cost-Linked Tasks & Errands</div>
+                                <button class="btn btn-primary btn-sm" onclick="switchTab('todos')">Open To-Dos &rarr;</button>
+                            </div>
+                            <div id="dashboardTodosPreview">
+                                <!-- Populated by renderTodos() -->
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -1904,6 +2242,30 @@
                  TAB 2: INCOME, MULTI-WALLET & EXPENSES
                  ========================================== -->
             <section id="tab-transactions" class="tab-section">
+                <!-- 📊 7-DAY SPENDING BURN & CATEGORY ANALYTICS VISUALS (MOVED FROM HOME PAGE) -->
+                <div class="card" style="margin-bottom: 18px;">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">&#128202; 7-Day Spending Burn & Category Analytics</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0;">Visual analytics of your spending momentum and staple distribution</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="renderCharts()">🔄 Refresh Charts</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                        <div>
+                            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">7-Day Spending Burn</h4>
+                            <div class="chart-container">
+                                <canvas id="burnChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Category Breakdown</h4>
+                            <div class="chart-container">
+                                <canvas id="categoryDonutChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Live Bank & Savings Accounts Strip on Spends Tab -->
                 <div class="card" style="margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -2528,6 +2890,103 @@
                 📄 <strong>Database Schema Ready:</strong> We generated <code>schema.sql</code> in your project. Simply copy and run it in the Supabase SQL Editor to set up all 10 tables and Row-Level Security!
             </div>
         </div>
+    </div>
+
+
+    <!-- ==========================================
+         MODAL: ADD MONEY TO MULTI-WALLET (OPAY STYLE)
+         ========================================== -->
+    <div class="modal-backdrop" id="addMoneyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="card-title" style="font-size: 1.15rem;">➕ Add Money / Fund Wallet</h3>
+                <button class="btn-icon" onclick="closeAddMoneyModal()" style="border: none;">&times;</button>
+            </div>
+            <form onsubmit="handleAddMoneySubmit(event)">
+                <div class="form-group">
+                    <label>Target Account / Wallet</label>
+                    <select id="addMoneyTargetWallet" class="form-control" required>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- ONE-TAP QUICK PRESETS (As specified: 1,000, 5,000, 15,000 + quick presets) -->
+                <div class="form-group">
+                    <label style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>⚡ One-Tap Quick Presets</span>
+                        <span style="font-size: 0.72rem; color: var(--primary); font-weight: 600;">Tap to load amount</span>
+                    </label>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(1000)" style="font-weight: 700;">+₦1,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(2000)" style="font-weight: 700;">+₦2,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(5000)" style="font-weight: 700;">+₦5,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(10000)" style="font-weight: 700;">+₦10,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(15000)" style="font-weight: 700;">+₦15,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(20000)" style="font-weight: 700;">+₦20,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(50000)" style="font-weight: 700;">+₦50,000</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setAddMoneyAmount(100000)" style="font-weight: 700;">+₦100,000</button>
+                    </div>
+                </div>
+
+                <!-- EDITABLE AMOUNT FIELD -->
+                <div class="form-group">
+                    <label>Amount to Add (₦)</label>
+                    <input type="number" id="addMoneyAmount" class="form-control" placeholder="Enter or edit amount (e.g. 5000)" required min="1" step="any" style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">
+                </div>
+
+                <div class="form-group">
+                    <label>Inflow Description</label>
+                    <input type="text" id="addMoneyTitle" class="form-control" placeholder="e.g. Monthly Allowance, Cash Gift, Awoof">
+                </div>
+
+                <div class="form-group">
+                    <label>Category Source</label>
+                    <select id="addMoneyCategory" class="form-control">
+                        <option value="Monthly Pocket Money / Home Allowance">Monthly Allowance / Pocket Money</option>
+                        <option value="Salary / Hustle / Tech Gig">Salary / Side Hustle</option>
+                        <option value="Awoof / Cash Gift">Awoof / Cash Gift</option>
+                        <option value="Transfer from Friend / Coursemate">Transfer from Friend</option>
+                        <option value="Refund / Cashback">Refund / Cashback</option>
+                        <option value="Other Inflow">Other Inflow</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;">
+                    <button type="button" class="btn btn-outline" onclick="closeAddMoneyModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 11px 22px; font-weight: 800;">
+                        ➕ Confirm & Add Money
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bottom Nav More Dropdown & Backdrop -->
+    <div class="m-nav-dropdown-backdrop" id="mNavDropdownBackdrop" onclick="toggleBottomMoreDropdown(false)"></div>
+    <div class="m-nav-dropdown-menu" id="mNavDropdownMenu">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); padding: 4px 10px 8px 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); margin-bottom: 6px;">
+            More Apps & Features
+        </div>
+        <button class="m-nav-dropdown-item" onclick="switchTab('todos'); toggleBottomMoreDropdown(false);">
+            <span>&#9989;</span>
+            <span>Cost-Linked To-Do & Errands</span>
+        </button>
+        <button class="m-nav-dropdown-item" onclick="switchTab('debts'); toggleBottomMoreDropdown(false);">
+            <span>&#129309;</span>
+            <span>Coursemate Debts & IOUs</span>
+        </button>
+        <button class="m-nav-dropdown-item" onclick="switchTab('market'); toggleBottomMoreDropdown(false);">
+            <span>&#128722;</span>
+            <span>Market Price Memory</span>
+        </button>
+        <button class="m-nav-dropdown-item" onclick="switchTab('bills'); toggleBottomMoreDropdown(false);">
+            <span>&#9889;</span>
+            <span>NEPA & Utility Estimators</span>
+        </button>
+        <button class="m-nav-dropdown-item" onclick="switchTab('settings'); toggleBottomMoreDropdown(false);">
+            <span>&#9881;&#65039;</span>
+            <span>Settings & Cloud Sync</span>
+        </button>
     </div>
 
     <!-- MODAL 0: MANAGE MULTI-WALLET ACCOUNTS (REMOVE / ADD) -->
@@ -3643,6 +4102,170 @@
         /* --------------------------------------------------------------------------
            RENDER DASHBOARD & STUDENT ALLOWANCE RUNWAY
            -------------------------------------------------------------------------- */
+
+        /* ==========================================================================
+           OPAY-STYLE INTERACTION & ADD MONEY FUNCTIONS
+           ========================================================================== */
+        function openAddMoneyModal(walletId) {
+            const modal = document.getElementById("addMoneyModal");
+            if (!modal) return;
+            const select = document.getElementById("addMoneyTargetWallet");
+            if (select) {
+                select.innerHTML = "";
+                (appData.wallets || []).forEach(w => {
+                    const opt = document.createElement("option");
+                    opt.value = w.id;
+                    opt.textContent = `${w.name} (${formatNaira(w.balance)})`;
+                    if (walletId && w.id === walletId) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+            const amtInput = document.getElementById("addMoneyAmount");
+            if (amtInput) amtInput.value = "";
+            const titleInput = document.getElementById("addMoneyTitle");
+            if (titleInput) titleInput.value = "";
+            openModal("addMoneyModal");
+        }
+
+        function closeAddMoneyModal() {
+            closeModal("addMoneyModal");
+        }
+
+        function setAddMoneyAmount(amount) {
+            const input = document.getElementById("addMoneyAmount");
+            if (input) {
+                input.value = amount;
+                if (input.focus) input.focus();
+            }
+        }
+
+        function handleAddMoneySubmit(e) {
+            if (e) e.preventDefault();
+            const select = document.getElementById("addMoneyTargetWallet");
+            const amtInput = document.getElementById("addMoneyAmount");
+            const titleInput = document.getElementById("addMoneyTitle");
+            const catSelect = document.getElementById("addMoneyCategory");
+
+            const walletId = select ? select.value : (appData.wallets[0] ? appData.wallets[0].id : null);
+            const amount = parseFloat(amtInput ? amtInput.value : 0);
+            const title = (titleInput && titleInput.value.trim()) || "Allowance Inflow";
+            const category = (catSelect && catSelect.value) || "Monthly Pocket Money / Home Allowance";
+
+            if (!walletId) {
+                showToast("Please select a target wallet.", "danger");
+                return;
+            }
+            if (isNaN(amount) || amount <= 0) {
+                showToast("Please enter a valid amount greater than zero.", "danger");
+                return;
+            }
+
+            const wallet = (appData.wallets || []).find(w => w.id === walletId);
+            if (!wallet) {
+                showToast("Target wallet not found.", "danger");
+                return;
+            }
+
+            // 1. Credit wallet
+            wallet.balance = (parseFloat(wallet.balance) || 0) + amount;
+
+            // 2. Log income transaction
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, "0");
+            const dd = String(now.getDate()).padStart(2, "0");
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+
+            const newTx = {
+                id: "tx-" + Date.now(),
+                type: "income",
+                title: title,
+                amount: amount,
+                category: category,
+                walletId: walletId,
+                date: dateStr
+            };
+
+            if (!appData.transactions) appData.transactions = [];
+            appData.transactions.unshift(newTx);
+
+            // Guard against stale cloud overwrite
+            lastLocalChangeTime = Date.now();
+
+            saveState();
+            renderDashboard(); renderWallets(); renderTransactions();
+            closeAddMoneyModal();
+
+            showToast(`✅ Successfully added ${formatNaira(amount)} to ${wallet.name}!`, "success");
+
+            // Non-blocking parallel cloud sync
+            if (supabaseClient && currentUser) {
+                syncStateToCloud().catch(err => console.warn("Background sync error:", err));
+            }
+        }
+
+        function renderRecentDashboardTransactions() {
+            const container = document.getElementById("dashboardRecentTransactions");
+            if (!container) return;
+            container.innerHTML = "";
+
+            const txs = (appData.transactions || []).slice(0, 4);
+            if (txs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 20px 12px; font-size: 0.85rem;">
+                        No recent transactions yet. Tap <strong style="color: var(--primary); cursor: pointer;" onclick="openAddMoneyModal()">[➕ Add Money]</strong> to fund a wallet!
+                    </div>
+                `;
+                return;
+            }
+
+            txs.forEach(tx => {
+                const item = document.createElement("div");
+                item.className = "tx-item";
+                item.style.padding = "10px 14px";
+                item.style.cursor = "pointer";
+                item.onclick = () => switchTab('transactions');
+
+                const isExp = tx.type === "expense";
+                const icon = isExp ? "📉" : "📈";
+                item.innerHTML = `
+                    <div class="tx-left">
+                        <div class="tx-icon" style="width: 36px; height: 36px; font-size: 1rem; border-radius: 10px; background: ${isExp ? 'var(--danger-light)' : 'var(--success-light)'};">
+                            ${icon}
+                        </div>
+                        <div class="tx-info">
+                            <h4 style="font-size: 0.88rem; margin-bottom: 2px;">${tx.title || 'Transaction'}</h4>
+                            <p style="font-size: 0.72rem; color: var(--text-muted);">${tx.category || 'General'} &bull; ${tx.date || 'Recent'}</p>
+                        </div>
+                    </div>
+                    <div class="tx-right">
+                        <div class="tx-amount ${isExp ? 'expense' : 'income'}" style="font-size: 0.95rem;">
+                            ${isExp ? '-' : '+'}${formatNaira(tx.amount)}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function toggleBottomToolsDropdown() {
+            const body = document.getElementById("bottomToolsDropdownBody");
+            const arrow = document.getElementById("bottomToolsArrow");
+            if (!body) return;
+            const isHidden = body.style.display === "none";
+            body.style.display = isHidden ? "block" : "none";
+            if (arrow) arrow.textContent = isHidden ? "▴" : "▾";
+        }
+
+        function toggleBottomMoreDropdown(forceState) {
+            const menu = document.getElementById("mNavDropdownMenu");
+            const backdrop = document.getElementById("mNavDropdownBackdrop");
+            if (!menu || !backdrop) return;
+            const willOpen = typeof forceState === "boolean" ? forceState : !menu.classList.contains("open");
+            menu.classList.toggle("open", willOpen);
+            backdrop.classList.toggle("open", willOpen);
+        }
+
         function renderDashboard() {
             const m = computeMetrics();
             const isStudent = appData.student && appData.student.enabled;
@@ -3746,6 +4369,9 @@
 
             // Dashboard To-Do preview
             renderTodos();
+            renderRecentDashboardTransactions();
+            const greetEl = document.getElementById("dashboardGreetingName");
+            if (greetEl && appData.user) greetEl.textContent = appData.user.name || "Student";
         }
 
         function renderQuickPresets() {
@@ -3850,6 +4476,7 @@
                         </div>
                         <div class="wallet-bal naira-mask" style="margin-bottom: 10px;">${formatNaira(w.balance)}</div>
                         <div style="display: flex; gap: 6px; justify-content: flex-end; border-top: 1px dashed var(--border); padding-top: 8px;">
+                            <button class="btn btn-primary btn-sm" onclick="openAddMoneyModal('${w.id}')" title="Add Money to Account" style="font-size: 0.75rem; padding: 4px 10px; font-weight: 700; background: var(--primary);">➕ Add</button>
                             <button class="btn btn-outline btn-sm" onclick="promptEditWallet('${w.id}')" title="Edit Balance" style="font-size: 0.72rem; padding: 4px 9px;">✏️ Balance</button>
                             <button class="btn btn-outline btn-sm" onclick="deleteWallet('${w.id}')" title="Remove Account" style="font-size: 0.72rem; padding: 4px 9px; color: var(--danger); border-color: var(--danger);">🗑️ Remove</button>
                         </div>
@@ -3881,8 +4508,8 @@
             const canvas = document.getElementById("burnChart");
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
-            const w = canvas.parentElement.clientWidth || 300;
-            const h = canvas.parentElement.clientHeight || 200;
+            const w = (canvas.parentElement && canvas.parentElement.clientWidth) || 300;
+            const h = (canvas.parentElement && canvas.parentElement.clientHeight) || 200;
             canvas.width = w;
             canvas.height = h;
 
@@ -3950,8 +4577,8 @@
             const canvas = document.getElementById("categoryDonutChart");
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
-            const w = canvas.parentElement.clientWidth || 300;
-            const h = canvas.parentElement.clientHeight || 200;
+            const w = (canvas.parentElement && canvas.parentElement.clientWidth) || 300;
+            const h = (canvas.parentElement && canvas.parentElement.clientHeight) || 200;
             canvas.width = w;
             canvas.height = h;
 
@@ -7519,7 +8146,7 @@
 
             if (tabId === "dashboard") { renderWallets(); renderDashboard(); }
             if (tabId === "campus") renderStudentCampusHub();
-            if (tabId === "transactions") { renderWallets(); renderTransactions(); }
+            if (tabId === "transactions") { renderWallets(); renderTransactions(); renderCharts(); }
             if (tabId === "market") renderMarketStaples();
             if (tabId === "bills") renderBillsAndEstimators();
             if (tabId === "debts") renderDebts();
